@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   );
 
   const now = new Date();
-  const in60 = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
+  const in24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
 
   const { data: expiring } = await supabase
     .from("shares")
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
       "id, token, title, expires_at, created_by, notified_at, notify_on_expiry",
     )
     .gte("expires_at", now.toISOString())
-    .lte("expires_at", in60)
+    .lte("expires_at", in24Hours)
     .eq("revoked", false)
     .eq("notify_on_expiry", true)
     .is("notified_at", null);
