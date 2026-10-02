@@ -1,0 +1,64 @@
+import { createClient } from "@/lib/supabase/server";
+import { PublicPageHeader } from "@/components/ui/public-page-header";
+import { ProjectCard } from "@/components/projects/project-card";
+import { EmptyState } from "@/components/ui/empty-state";
+
+export const metadata = {
+  title: "Projects",
+  description: "Things built at Sidequest Studio.",
+};
+
+type Project = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  cover_image_url: string | null;
+  tech_stack: string[];
+  featured: boolean;
+};
+
+export default async function ProjectsPage() {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("projects")
+    .select("id, slug, title, summary, cover_image_url, tech_stack, featured")
+    .eq("status", "published")
+    .order("featured", { ascending: false })
+    .order("sort_order", { ascending: false })
+    .order("created_at", { ascending: false });
+
+  const projects: Project[] = (data ?? []).map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    title: p.title,
+    summary: p.summary,
+    cover_image_url: p.cover_image_url,
+    tech_stack: p.tech_stack ?? [],
+    featured: p.featured,
+  }));
+
+  return (
+    <div className="max-w-5xl mx-auto px-6 py-16">
+      <PublicPageHeader
+        breadcrumbs={[{ label: "Portfolio", href: "/" }, { label: "Projects" }]}
+        title="Projects"
+        description="A running list of things worth building."
+      />
+
+      {projects.length === 0 ? (
+        <EmptyState
+          title="No projects yet"
+          description="Projects will appear here once they're published."
+        />
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
