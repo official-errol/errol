@@ -4,7 +4,7 @@ A personal multi-purpose platform: portfolio, blog, file sharing, and community 
 
 ## Live Site
 
-https://sidequeststudio.me
+https://sidequeststudio.vercel.app
 
 ## Tech Stack
 

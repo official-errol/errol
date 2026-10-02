@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   description:
     "A personal multi-purpose platform: portfolio, blog, and file sharing.",
-  metadataBase: new URL("https://sidequeststudio.me"),
+  metadataBase: new URL("https://sidequeststudio.vercel.app"),
 };
 
 export default function RootLayout({
@@ -38,6 +38,12 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrains.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <meta
+          name="google-site-verification"
+          content="2S9obhawLxeaQKoDR3e-mN-DQdxH52DUuo9jcaReSjY"
+        />
+      </head>
       <body>
         <ThemeProvider>
           <LoginDialogProvider>

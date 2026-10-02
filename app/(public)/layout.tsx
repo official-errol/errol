@@ -28,8 +28,8 @@ export default async function PublicLayout({
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Sidequest Studio",
-    url: "https://sidequeststudio.me",
-    logo: "https://sidequeststudio.me/logo.png",
+    url: "https://sidequeststudio.vercel.app",
+    logo: "https://sidequeststudio.vercel.app/logo.png",
   };
 
   return (

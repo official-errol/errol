@@ -30,13 +30,13 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt ?? undefined,
     alternates: {
-      canonical: `https://sidequeststudio.me/blog/${slug}`,
+      canonical: `https://sidequeststudio.vercel.app/blog/${slug}`,
     },
     openGraph: {
       title: post.title,
       description: post.excerpt ?? undefined,
       type: "article",
-      url: `https://sidequeststudio.me/blog/${slug}`,
+      url: `https://sidequeststudio.vercel.app/blog/${slug}`,
       publishedTime: post.published_at ?? undefined,
     },
     twitter: {
@@ -118,16 +118,16 @@ export default async function PostPage({
     author: {
       "@type": "Organization",
       name: "Sidequest Studio",
-      url: "https://sidequeststudio.me",
+      url: "https://sidequeststudio.vercel.app",
     },
     publisher: {
       "@type": "Organization",
       name: "Sidequest Studio",
-      url: "https://sidequeststudio.me",
+      url: "https://sidequeststudio.vercel.app",
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://sidequeststudio.me/blog/${post.slug}`,
+      "@id": `https://sidequeststudio.vercel.app/blog/${post.slug}`,
     },
   };
 
