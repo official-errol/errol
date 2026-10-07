@@ -51,9 +51,9 @@ export default async function PublicLayout({
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-border bg-surface">
-        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-text-secondary">
+        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-text-secondary">
           <p>© {new Date().getFullYear()} Errol</p>
-          <div className="flex flex-wrap gap-6">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
             <Link href="/projects" className="hover:text-text-primary">
               Projects
             </Link>
@@ -65,6 +65,12 @@ export default async function PublicLayout({
             </Link>
             <Link href="/contact" className="hover:text-text-primary">
               Contact
+            </Link>
+            <Link href="/privacy" className="hover:text-text-primary">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-text-primary">
+              Terms
             </Link>
           </div>
         </div>
