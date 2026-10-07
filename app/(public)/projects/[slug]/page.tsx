@@ -41,7 +41,7 @@ export async function generateMetadata({
     title: project.title,
     description: project.summary ?? undefined,
     alternates: {
-      canonical: `https://sidequeststudio.vercel.app/projects/${slug}`,
+      canonical: `https://errol.vercel.app/projects/${slug}`,
     },
   };
 }
@@ -86,7 +86,7 @@ export default async function ProjectPage({
     description: project.summary,
     dateCreated: project.created_at,
     image: project.cover_image_url ?? undefined,
-    url: `https://sidequeststudio.vercel.app/projects/${project.slug}`,
+    url: `https://errol.vercel.app/projects/${project.slug}`,
   };
 
   return (

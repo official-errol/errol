@@ -56,7 +56,7 @@ export default async function ShareDetailPage({
   }
 
   const isExpired = new Date(share.expires_at).getTime() < Date.now();
-  const url = `https://sidequeststudio.vercel.app/s/${share.token}`;
+  const url = `https://errol.vercel.app/s/${share.token}`;
 
   return (
     <div className="space-y-8">

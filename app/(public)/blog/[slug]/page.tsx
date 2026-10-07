@@ -30,13 +30,13 @@ export async function generateMetadata({
     title: post.title,
     description: post.excerpt ?? undefined,
     alternates: {
-      canonical: `https://sidequeststudio.vercel.app/blog/${slug}`,
+      canonical: `https://errol.vercel.app/blog/${slug}`,
     },
     openGraph: {
       title: post.title,
       description: post.excerpt ?? undefined,
       type: "article",
-      url: `https://sidequeststudio.vercel.app/blog/${slug}`,
+      url: `https://errol.vercel.app/blog/${slug}`,
       publishedTime: post.published_at ?? undefined,
     },
     twitter: {
@@ -117,17 +117,17 @@ export default async function PostPage({
     image: post.cover_image_url ?? undefined,
     author: {
       "@type": "Organization",
-      name: "Sidequest Studio",
-      url: "https://sidequeststudio.vercel.app",
+      name: "Errol",
+      url: "https://errol.vercel.app",
     },
     publisher: {
       "@type": "Organization",
-      name: "Sidequest Studio",
-      url: "https://sidequeststudio.vercel.app",
+      name: "Errol",
+      url: "https://errol.vercel.app",
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://sidequeststudio.vercel.app/blog/${post.slug}`,
+      "@id": `https://errol.vercel.app/blog/${post.slug}`,
     },
   };
 

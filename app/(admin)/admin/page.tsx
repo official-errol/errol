@@ -72,7 +72,7 @@ export default async function AdminOverviewPage() {
     <div className="space-y-8">
       <PageHeader
         title="Overview"
-        description="A quick look at what's happening on Sidequest Studio."
+        description="A quick look at what's happening on Errol."
       />
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

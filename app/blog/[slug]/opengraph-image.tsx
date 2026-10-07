@@ -14,7 +14,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
     .eq("published", true)
     .single();
 
-  const title = post?.title ?? "Sidequest Studio";
+  const title = post?.title ?? "Errol";
   const excerpt = post?.excerpt ?? "";
 
   return new ImageResponse(
@@ -47,7 +47,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
             background: "#3B82F6",
           }}
         />
-        sidequeststudio.me / blog
+        errol.is-a.dev / blog
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -84,7 +84,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
       </div>
 
       <div style={{ display: "flex", fontSize: "24px", color: "#6C7278" }}>
-        Read on Sidequest Studio
+        Read on Errol
       </div>
     </div>,
     { ...size },

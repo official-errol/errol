@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sidequest Studio separates concerns into three main systems:
+Errol separates concerns into three main systems:
 
 - Supabase handles authentication, Postgres database, and Row Level Security
 - Cloudflare R2 handles file storage with zero egress fees

@@ -1,10 +1,10 @@
-# Sidequest Studio
+# Errol
 
 A personal multi-purpose platform: portfolio, blog, file sharing, and community space.
 
 ## Live Site
 
-https://sidequeststudio.vercel.app
+https://errol.vercel.app
 
 ## Tech Stack
 

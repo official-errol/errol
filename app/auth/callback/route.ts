@@ -3,8 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
-  "https://sidequeststudio.vercel.app",
-  "https://www.sidequeststudio.me",
+  "https://errol.vercel.app",
+  "https://www.errol.is-a.dev",
 ];
 
 export async function GET(request: Request) {

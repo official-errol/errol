@@ -19,12 +19,12 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Sidequest Studio",
-    template: "%s · Sidequest Studio",
+    default: "Errol",
+    template: "%s · Errol",
   },
   description:
     "A personal multi-purpose platform: portfolio, blog, and file sharing.",
-  metadataBase: new URL("https://sidequeststudio.vercel.app"),
+  metadataBase: new URL("https://errol.vercel.app"),
 };
 
 export default function RootLayout({

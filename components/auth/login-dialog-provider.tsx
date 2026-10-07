@@ -45,7 +45,7 @@ export function LoginDialogProvider({ children }: { children: ReactNode }) {
       <Dialog open={open} onClose={closeLogin} title="Sign in" maxWidth="sm">
         <div className="space-y-5">
           <p className="text-sm text-text-secondary">
-            Continue with your Google account to access Sidequest Studio.
+            Continue with your Google account to access Errol.
           </p>
 
           <GoogleButton next={next} />

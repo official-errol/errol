@@ -14,7 +14,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
     .eq("status", "published")
     .single();
 
-  const title = project?.title ?? "Sidequest Studio";
+  const title = project?.title ?? "Errol";
   const summary = project?.summary ?? "";
 
   const rawTech = project?.tech_stack;
@@ -52,7 +52,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
             background: "#3B82F6",
           }}
         />
-        sidequeststudio.me / projects
+        errol.is-a.dev / projects
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>

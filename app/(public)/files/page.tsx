@@ -9,7 +9,7 @@ import { SignInPrompt } from "@/components/auth/sign-in-prompt";
 
 export const metadata = {
   title: "Files",
-  description: "Shared downloads from Sidequest Studio.",
+  description: "Shared downloads from Errol.",
 };
 
 type FileRecord = {

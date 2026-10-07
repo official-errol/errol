@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata = {
   title: "Projects",
-  description: "Things built at Sidequest Studio.",
+  description: "Things built at Errol.",
 };
 
 type Project = {

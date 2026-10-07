@@ -27,9 +27,9 @@ export default async function PublicLayout({
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Sidequest Studio",
-    url: "https://sidequeststudio.vercel.app",
-    logo: "https://sidequeststudio.vercel.app/logo.png",
+    name: "Errol",
+    url: "https://errol.vercel.app",
+    logo: "https://errol.vercel.app/logo.png",
   };
 
   return (
@@ -52,7 +52,7 @@ export default async function PublicLayout({
 
       <footer className="border-t border-border bg-surface">
         <div className="max-w-5xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-text-secondary">
-          <p>© {new Date().getFullYear()} Sidequest Studio</p>
+          <p>© {new Date().getFullYear()} Errol</p>
           <div className="flex flex-wrap gap-6">
             <Link href="/projects" className="hover:text-text-primary">
               Projects

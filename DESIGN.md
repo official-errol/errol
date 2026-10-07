@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: Sidequest Studio
+name: Errol
 description: A personal multi-purpose platform for portfolio, blog, file-sharing, and community.
 
 colors:
@@ -96,13 +96,13 @@ components:
     padding: "{spacing.sm} {spacing.md}"
 ---
 
-# Sidequest Studio Design System
+# Errol Design System
 
 A calm, technical, personal space for side projects, writing, and shared files.
 
 ## Overview
 
-Sidequest Studio is a personal multi-purpose platform. The visual language should feel like a well-organized workshop: functional but not cold, technical but not intimidating.
+Errol is a personal multi-purpose platform. The visual language should feel like a well-organized workshop: functional but not cold, technical but not intimidating.
 
 The design prioritizes readability for long-form content, clarity for file management and admin tasks, and warmth so it feels like a personal project.
 

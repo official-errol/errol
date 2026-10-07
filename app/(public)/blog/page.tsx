@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata = {
   title: "Blog",
-  description: "Writing from Sidequest Studio.",
+  description: "Writing from Errol.",
 };
 
 type Post = {

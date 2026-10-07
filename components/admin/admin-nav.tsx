@@ -52,7 +52,7 @@ export function AdminNav({
             className="flex items-center gap-2 font-semibold text-text-primary"
           >
             <img src="/8ball.png" alt="" className="w-6 h-6" />
-            Sidequest Studio
+            Errol
           </Link>
           <nav className="hidden md:flex gap-6 overflow-x-auto">
             {NAV.map((item) => {
