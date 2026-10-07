@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
-  "https://errol.vercel.app",
+  "https://errolsolomon.vercel.app",
   "https://www.errol.is-a.dev",
 ];
 
