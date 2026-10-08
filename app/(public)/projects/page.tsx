@@ -21,6 +21,7 @@ type Project = {
   cover_image_url: string | null;
   tech_stack: string[];
   featured: boolean;
+  live_url: string | null;
 };
 
 export default async function ProjectsPage() {
@@ -28,7 +29,9 @@ export default async function ProjectsPage() {
 
   const { data } = await supabase
     .from("projects")
-    .select("id, slug, title, summary, cover_image_url, tech_stack, featured")
+    .select(
+      "id, slug, title, summary, cover_image_url, tech_stack, featured, live_url",
+    )
     .eq("status", "published")
     .order("featured", { ascending: false })
     .order("sort_order", { ascending: false })
@@ -42,6 +45,7 @@ export default async function ProjectsPage() {
     cover_image_url: p.cover_image_url,
     tech_stack: p.tech_stack ?? [],
     featured: p.featured,
+    live_url: p.live_url,
   }));
 
   return (
@@ -60,7 +64,19 @@ export default async function ProjectsPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
           {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+            <ProjectCard
+              key={project.id}
+              project={{
+                id: project.id,
+                slug: project.slug,
+                title: project.title,
+                summary: project.summary,
+                cover_image_url: project.cover_image_url,
+                tech_stack: project.tech_stack ?? [],
+                featured: project.featured,
+                live_url: project.live_url,
+              }}
+            />
           ))}
         </div>
       )}

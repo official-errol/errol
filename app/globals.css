@@ -100,3 +100,12 @@ body {
 .prose :where(h2, h3, h4) {
   scroll-margin-top: 6rem;
 }
+
+.prose pre {
+  position: relative;
+}
+
+.prose pre > code {
+  display: block;
+  padding-right: 3rem; /* leave room for the copy button */
+}

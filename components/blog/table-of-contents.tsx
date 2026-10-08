@@ -75,29 +75,80 @@ export function TableOfContentsMobile({ items }: { items: TocItem[] }) {
   if (items.length < 2) return null;
 
   return (
-    <details
-      className="bg-surface border border-border rounded-lg mb-6"
-      open={open}
-      onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}
-    >
-      <summary className="px-4 py-3 cursor-pointer text-sm font-medium text-text-primary select-none">
-        On this page ({items.length})
-      </summary>
-      <ul className="px-4 pb-3 space-y-1.5 border-t border-border pt-3">
-        {items.map((item) => (
-          <li key={item.id}>
-            <a
-              href={`#${item.id}`}
-              onClick={() => setTimeout(() => setOpen(false), 150)}
-              className={`block text-sm text-text-secondary hover:text-text-primary transition-colors ${
-                item.level === 3 ? "pl-4" : ""
-              }`}
-            >
-              {item.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </details>
+    <div className="mb-6 bg-surface border border-border rounded-lg overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-surface-subtle transition-colors"
+      >
+        <span className="flex items-center gap-2 min-w-0">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+            className="text-text-secondary shrink-0"
+          >
+            <path
+              d="M3 4h10M3 8h10M3 12h6"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+          <span className="text-sm font-medium text-text-primary truncate">
+            On this page
+          </span>
+          <span className="text-xs text-text-tertiary font-mono shrink-0">
+            {items.length}
+          </span>
+        </span>
+
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+          className={`text-text-secondary shrink-0 transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        >
+          <path
+            d="M4 6l4 4 4-4"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      <div
+        className={`grid transition-all duration-200 ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <ul className="border-t border-border py-2">
+            {items.map((item) => (
+              <li key={item.id}>
+                <a
+                  href={`#${item.id}`}
+                  onClick={() => setOpen(false)}
+                  className={`block text-sm text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors py-2 ${
+                    item.level === 3 ? "pl-8 pr-4" : "pl-4 pr-4"
+                  }`}
+                >
+                  {item.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
   );
 }

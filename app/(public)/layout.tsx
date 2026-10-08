@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PublicNav } from "@/components/layout/public-nav";
 import { AutoOpenLogin } from "@/components/auth/auto-open-login";
+import { BackToTop } from "@/components/blog/back-to-top";
 
 export default async function PublicLayout({
   children,
@@ -28,8 +29,8 @@ export default async function PublicLayout({
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Errol",
-    url: "https://errol.vercel.app",
-    logo: "https://errol.vercel.app/logo.png",
+    url: "https://errolsolomon.vercel.app",
+    logo: "https://errolsolomon.vercel.app/logo.png",
   };
 
   return (
@@ -51,9 +52,9 @@ export default async function PublicLayout({
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-border bg-surface">
-        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-text-secondary">
+        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-text-secondary">
           <p>© {new Date().getFullYear()} Errol</p>
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <div className="flex flex-wrap gap-6">
             <Link href="/projects" className="hover:text-text-primary">
               Projects
             </Link>
@@ -75,6 +76,8 @@ export default async function PublicLayout({
           </div>
         </div>
       </footer>
+
+      <BackToTop />
     </div>
   );
 }

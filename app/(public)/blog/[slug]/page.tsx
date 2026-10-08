@@ -11,11 +11,14 @@ import {
   TableOfContentsDesktop,
   TableOfContentsMobile,
 } from "@/components/blog/table-of-contents";
+import { CodeBlockEnhancer } from "@/components/blog/copy-code-button";
+import { RelatedPosts } from "@/components/blog/related-posts";
+import { TagChips } from "@/components/blog/tag-chips";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
 import { SignInPrompt } from "@/components/auth/sign-in-prompt";
 import { getReadingTime, formatReadingTime } from "@/lib/reading-time";
 import { extractToc } from "@/lib/toc";
-import { TagChips } from "@/components/blog/tag-chips";
+import { getRelatedPosts } from "@/lib/related-posts";
 
 const BASE_URL = "https://errolsolomon.vercel.app";
 
@@ -117,6 +120,8 @@ export default async function PostPage({
     .select("kind, user_id")
     .eq("post_id", post.id);
 
+  const relatedPosts = await getRelatedPosts(post.id, post.tags ?? [], 3);
+
   const postUrl = `${BASE_URL}/blog/${post.slug}`;
   const readingMinutes = getReadingTime(post.content);
   const toc = extractToc(post.content);
@@ -180,7 +185,17 @@ export default async function PostPage({
               >
                 {post.content}
               </ReactMarkdown>
+              <CodeBlockEnhancer />
             </div>
+
+            {post.tags && post.tags.length > 0 && (
+              <div className="mb-10 pb-8 border-b border-border">
+                <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-3">
+                  Tagged with
+                </p>
+                <TagChips tags={post.tags} size="md" />
+              </div>
+            )}
 
             <div className="flex flex-wrap items-center justify-between gap-4 pb-6">
               <ReactionButtons
@@ -196,14 +211,7 @@ export default async function PostPage({
               />
             </div>
 
-            {post.tags && post.tags.length > 0 && (
-              <div className="mt-12 pt-8 border-t border-border">
-                <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-3">
-                  Tagged with
-                </p>
-                <TagChips tags={post.tags} size="md" />
-              </div>
-            )}
+            <RelatedPosts posts={relatedPosts} />
 
             <section className="mt-12 pt-10 border-t border-border">
               <h2 className="text-xl font-semibold text-text-primary mb-6">

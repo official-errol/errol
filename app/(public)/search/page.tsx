@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchInput } from "@/components/search/search-input";
+import { TagChips } from "@/components/blog/tag-chips";
 import { getPreviewUrl } from "@/lib/storage";
 import {
   FileTextIcon,
@@ -28,6 +29,7 @@ type PostResult = {
   excerpt: string | null;
   cover_image_url: string | null;
   published_at: string | null;
+  tags: string[];
 };
 
 type ProjectResult = {
@@ -77,15 +79,24 @@ async function SearchResults({ query }: { query: string }) {
 
   if (query.length >= 2) {
     const pattern = `%${escapeForIlike(query)}%`;
+    const tagQuery = query.toLowerCase().trim();
 
-    const [postsRes, projectsRes, filesRes] = await Promise.all([
+    const [postsRes, postsTagRes, projectsRes, filesRes] = await Promise.all([
       supabase
         .from("posts")
-        .select("id, slug, title, excerpt, cover_image_url, published_at")
+        .select("id, slug, title, excerpt, cover_image_url, published_at, tags")
         .eq("published", true)
         .or(
           `title.ilike.${pattern},excerpt.ilike.${pattern},content.ilike.${pattern}`,
         )
+        .order("published_at", { ascending: false })
+        .limit(PER_GROUP),
+
+      supabase
+        .from("posts")
+        .select("id, slug, title, excerpt, cover_image_url, published_at, tags")
+        .eq("published", true)
+        .contains("tags", [tagQuery])
         .order("published_at", { ascending: false })
         .limit(PER_GROUP),
 
@@ -109,7 +120,18 @@ async function SearchResults({ query }: { query: string }) {
         .limit(PER_GROUP),
     ]);
 
-    posts = (postsRes.data ?? []) as PostResult[];
+    // Merge posts from content match + tag match, deduped by id
+    const postsById = new Map<string, PostResult>();
+    for (const post of postsRes.data ?? []) {
+      postsById.set(post.id, post as PostResult);
+    }
+    for (const post of postsTagRes.data ?? []) {
+      if (!postsById.has(post.id)) {
+        postsById.set(post.id, post as PostResult);
+      }
+    }
+    posts = Array.from(postsById.values());
+
     projects = (projectsRes.data ?? []) as ProjectResult[];
 
     const rawFiles = (filesRes.data ?? []) as Omit<FileResult, "previewUrl">[];
@@ -175,26 +197,34 @@ async function SearchResults({ query }: { query: string }) {
           </div>
           <div className="space-y-3">
             {posts.map((post) => (
-              <Link
+              <div
                 key={post.id}
-                href={`/blog/${post.slug}`}
                 className="flex gap-4 bg-surface border border-border rounded-lg p-4 hover:border-border-strong transition-colors"
               >
                 {post.cover_image_url && (
-                  <img
-                    src={post.cover_image_url}
-                    alt=""
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-md border border-border object-cover shrink-0"
-                  />
+                  <Link href={`/blog/${post.slug}`} className="shrink-0">
+                    <img
+                      src={post.cover_image_url}
+                      alt=""
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-md border border-border object-cover"
+                    />
+                  </Link>
                 )}
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-text-primary mb-1 truncate">
-                    {post.title}
-                  </h3>
+                  <Link href={`/blog/${post.slug}`} className="block">
+                    <h3 className="font-medium text-text-primary mb-1 truncate hover:text-accent transition-colors">
+                      {post.title}
+                    </h3>
+                  </Link>
                   {post.excerpt && (
                     <p className="text-sm text-text-secondary line-clamp-2">
                       {post.excerpt}
                     </p>
+                  )}
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="mt-2">
+                      <TagChips tags={post.tags.slice(0, 4)} />
+                    </div>
                   )}
                   {post.published_at && (
                     <div className="flex items-center gap-1.5 text-xs text-text-tertiary mt-2">
@@ -207,7 +237,7 @@ async function SearchResults({ query }: { query: string }) {
                     </div>
                   )}
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </section>
@@ -224,22 +254,25 @@ async function SearchResults({ query }: { query: string }) {
           </div>
           <div className="space-y-3">
             {projects.map((project) => (
-              <Link
+              <div
                 key={project.id}
-                href={`/projects/${project.slug}`}
                 className="flex gap-4 bg-surface border border-border rounded-lg p-4 hover:border-border-strong transition-colors"
               >
                 {project.cover_image_url && (
-                  <img
-                    src={project.cover_image_url}
-                    alt=""
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-md border border-border object-cover shrink-0"
-                  />
+                  <Link href={`/projects/${project.slug}`} className="shrink-0">
+                    <img
+                      src={project.cover_image_url}
+                      alt=""
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-md border border-border object-cover"
+                    />
+                  </Link>
                 )}
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-text-primary mb-1 truncate">
-                    {project.title}
-                  </h3>
+                  <Link href={`/projects/${project.slug}`} className="block">
+                    <h3 className="font-medium text-text-primary mb-1 truncate hover:text-accent transition-colors">
+                      {project.title}
+                    </h3>
+                  </Link>
                   {project.summary && (
                     <p className="text-sm text-text-secondary line-clamp-2">
                       {project.summary}
@@ -258,7 +291,7 @@ async function SearchResults({ query }: { query: string }) {
                     </div>
                   )}
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </section>

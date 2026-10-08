@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { resolveTechIcon } from "@/components/ui/tech-icon-matcher";
+import { getFaviconUrl } from "@/lib/favicon";
+import { FaviconImage } from "./favicon-image";
 
 type Project = {
   id: string;
@@ -9,38 +11,56 @@ type Project = {
   cover_image_url: string | null;
   tech_stack: string[];
   featured: boolean;
+  live_url?: string | null;
 };
 
 export function ProjectCard({ project }: { project: Project }) {
+  const faviconUrl = getFaviconUrl(project.live_url);
+
   return (
-    <Link
-      href={`/projects/${project.slug}`}
-      className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-border-strong transition-colors flex flex-col"
-    >
-      {project.cover_image_url ? (
-        <img
-          src={project.cover_image_url}
-          alt=""
-          className="w-full aspect-video object-cover border-b border-border"
-        />
-      ) : (
-        <div className="w-full aspect-video bg-surface-subtle border-b border-border flex items-center justify-center">
-          <span className="text-xs text-text-tertiary font-mono">
-            no preview
-          </span>
-        </div>
-      )}
+    <article className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-border-strong transition-colors flex flex-col">
+      <Link href={`/projects/${project.slug}`} className="block">
+        {project.cover_image_url ? (
+          <img
+            src={project.cover_image_url}
+            alt=""
+            className="w-full aspect-video object-cover border-b border-border"
+          />
+        ) : (
+          <div className="w-full aspect-video bg-surface-subtle border-b border-border flex items-center justify-center">
+            <span className="text-xs text-text-tertiary font-mono">
+              no preview
+            </span>
+          </div>
+        )}
+      </Link>
 
       <div className="p-5 flex-1 flex flex-col">
-        <div className="flex items-start justify-between gap-2 mb-1.5">
-          <h3 className="font-semibold text-text-primary group-hover:text-accent transition-colors">
-            {project.title}
-          </h3>
-          {project.featured && (
-            <span className="text-xs px-1.5 py-0.5 bg-accent-subtle text-accent rounded-sm shrink-0">
-              Featured
-            </span>
+        <div className="flex items-start gap-2 mb-1.5">
+          {faviconUrl && (
+            <FaviconImage
+              src={faviconUrl}
+              size={16}
+              className="w-4 h-4 mt-1 rounded-sm shrink-0"
+            />
           )}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <Link
+                href={`/projects/${project.slug}`}
+                className="block min-w-0"
+              >
+                <h3 className="font-semibold text-text-primary group-hover:text-accent transition-colors">
+                  {project.title}
+                </h3>
+              </Link>
+              {project.featured && (
+                <span className="text-xs px-1.5 py-0.5 bg-accent-subtle text-accent rounded-sm shrink-0">
+                  Featured
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         {project.summary && (
@@ -71,6 +91,6 @@ export function ProjectCard({ project }: { project: Project }) {
           </div>
         )}
       </div>
-    </Link>
+    </article>
   );
 }

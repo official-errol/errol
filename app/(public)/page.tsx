@@ -95,7 +95,7 @@ export default async function PortfolioPage() {
     getSocialLinks(),
     supabase
       .from("projects")
-      .select("id, slug, title, summary, cover_image_url, tech_stack")
+      .select("id, slug, title, summary, cover_image_url, tech_stack, live_url")
       .eq("status", "published")
       .eq("featured", true)
       .order("sort_order", { ascending: false })
@@ -624,6 +624,7 @@ export default async function PortfolioPage() {
                     cover_image_url: project.cover_image_url,
                     tech_stack: project.tech_stack ?? [],
                     featured: true,
+                    live_url: project.live_url,
                   }}
                 />
               ))}
