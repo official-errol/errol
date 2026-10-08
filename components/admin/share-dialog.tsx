@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
+import { Button } from "@/components/ui/button";
+import { CopyIcon, XIcon, PlusIcon } from "@/components/ui/icons";
+import { useToast } from "@/components/ui/toast";
 
 type FileOption = {
   id: string;
@@ -26,14 +29,14 @@ function formatBytes(bytes: number) {
 
 export function ShareDialog({ files, onClose }: Props) {
   const router = useRouter();
+  const { toast } = useToast();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [visibility, setVisibility] = useState<"public" | "authenticated">(
     "authenticated",
   );
   const [title, setTitle] = useState("");
-  const [hours, setHours] = useState(24);
+  const [password, setPassword] = useState("");
   const [creating, setCreating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -47,7 +50,6 @@ export function ShareDialog({ files, onClose }: Props) {
   async function handleCreate() {
     if (selected.size === 0) return;
     setCreating(true);
-    setError(null);
 
     try {
       const res = await fetch("/api/shares", {
@@ -57,18 +59,17 @@ export function ShareDialog({ files, onClose }: Props) {
           fileIds: Array.from(selected),
           visibility,
           title,
-          expiresInHours: hours,
+          password: password || undefined,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not create share");
 
-      const url = `${window.location.origin}/s/${data.share.token}`;
-      setShareUrl(url);
+      setShareUrl(`${window.location.origin}/s/${data.share.token}`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed");
+      toast(err instanceof Error ? err.message : "Failed", "error");
     } finally {
       setCreating(false);
     }
@@ -78,6 +79,7 @@ export function ShareDialog({ files, onClose }: Props) {
     if (!shareUrl) return;
     await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
+    toast("Link copied", "success");
     setTimeout(() => setCopied(false), 2000);
   }
 
@@ -90,16 +92,17 @@ export function ShareDialog({ files, onClose }: Props) {
           </h2>
           <button
             onClick={onClose}
-            className="text-text-secondary hover:text-text-primary"
+            className="text-text-secondary hover:text-text-primary p-1"
           >
-            ✕
+            <XIcon />
           </button>
         </div>
 
         {shareUrl ? (
           <div className="p-6 space-y-4">
             <p className="text-sm text-text-secondary">
-              Anyone with this link can access the files.
+              Anyone with this link can access the files. This link never
+              expires.
             </p>
             <div className="flex gap-2">
               <input
@@ -108,24 +111,19 @@ export function ShareDialog({ files, onClose }: Props) {
                 readOnly
                 className="flex-1 bg-surface border border-border rounded-sm px-3 py-2 text-sm font-mono text-text-primary"
               />
-              <button
-                onClick={copyLink}
-                className="px-4 py-2 bg-primary text-text-inverse rounded-md text-sm hover:bg-accent"
-              >
+              <Button onClick={copyLink}>
+                <CopyIcon />
                 {copied ? "Copied" : "Copy"}
-              </button>
+              </Button>
             </div>
 
             <div className="flex justify-center py-4 bg-surface-subtle rounded-md">
               <QRCodeSVG value={shareUrl} size={180} />
             </div>
 
-            <button
-              onClick={onClose}
-              className="w-full px-4 py-2 border border-border text-text-primary rounded-md text-sm hover:bg-surface-subtle"
-            >
+            <Button variant="secondary" className="w-full" onClick={onClose}>
               Done
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="p-6 space-y-4">
@@ -145,23 +143,6 @@ export function ShareDialog({ files, onClose }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1.5">
-                Expires in (hours)
-              </label>
-              <input
-                type="number"
-                min={1}
-                max={720}
-                value={hours}
-                onChange={(e) => setHours(parseInt(e.target.value) || 24)}
-                className="w-full bg-surface border border-border rounded-sm px-3 py-2 text-sm"
-              />
-              <p className="text-xs text-text-tertiary mt-1">
-                Between 1 hour and 30 days.
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1.5">
                 Who can access
               </label>
               <select
@@ -174,6 +155,19 @@ export function ShareDialog({ files, onClose }: Props) {
                 <option value="authenticated">Signed-in users</option>
                 <option value="public">Anyone with the link</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1.5">
+                Password (optional)
+              </label>
+              <input
+                type="text"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Leave blank for none"
+                className="w-full bg-surface border border-border rounded-sm px-3 py-2 text-sm"
+              />
             </div>
 
             <div>
@@ -217,19 +211,15 @@ export function ShareDialog({ files, onClose }: Props) {
               </div>
             </div>
 
-            {error && (
-              <p className="text-sm text-error bg-error/10 px-3 py-2 rounded-sm">
-                {error}
-              </p>
-            )}
-
-            <button
+            <Button
               onClick={handleCreate}
-              disabled={creating || selected.size === 0}
-              className="w-full px-4 py-2 bg-primary text-text-inverse rounded-md text-sm hover:bg-accent disabled:opacity-50"
+              loading={creating}
+              disabled={selected.size === 0}
+              className="w-full"
             >
-              {creating ? "Creating…" : "Create share link"}
-            </button>
+              <PlusIcon />
+              Create share link
+            </Button>
           </div>
         )}
       </div>

@@ -17,6 +17,7 @@ export default async function AdminPostsPage() {
       <PageHeader
         title="Posts"
         description="Write, edit, and publish blog posts."
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Posts" }]}
         action={
           <ButtonLink href="/admin/posts/new">
             <PlusIcon />

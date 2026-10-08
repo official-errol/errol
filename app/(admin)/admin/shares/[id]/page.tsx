@@ -14,7 +14,7 @@ export default async function ShareDetailPage({
   const { data: share } = await supabase
     .from("shares")
     .select(
-      "id, token, title, visibility, expires_at, view_count, download_count, revoked, created_at, password_hash",
+      "id, token, title, visibility, view_count, download_count, revoked, created_at, password_hash",
     )
     .eq("id", id)
     .single();
@@ -55,45 +55,35 @@ export default async function ShareDetailPage({
     }
   }
 
-  const isExpired = new Date(share.expires_at).getTime() < Date.now();
-  const url = `https://errol.vercel.app/s/${share.token}`;
+  const url = `https://errolsolomon.vercel.app/s/${share.token}`;
 
   return (
     <div className="space-y-8">
-      <div>
-        <PageHeader
-          title={share.title ?? "Untitled share"}
-          breadcrumbs={[
-            { label: "Admin", href: "/admin" },
-            { label: "Shares", href: "/admin/shares" },
-            { label: share.title ?? "Untitled" },
-          ]}
-        />
-        <h1 className="text-3xl font-semibold text-text-primary mt-4">
-          {share.title ?? "Untitled share"}
-        </h1>
-        <div className="flex items-center gap-3 mt-2 text-sm text-text-secondary">
-          <span className="font-mono text-xs">{url}</span>
-          {share.password_hash && (
-            <span className="text-xs px-2 py-0.5 bg-warning/10 text-warning rounded-sm">
-              Password
-            </span>
-          )}
-          {share.visibility === "public" ? (
-            <span className="text-xs px-2 py-0.5 bg-success/10 text-success rounded-sm">
-              Public
-            </span>
-          ) : (
-            <span className="text-xs px-2 py-0.5 bg-accent-subtle text-accent rounded-sm">
-              Authenticated
-            </span>
-          )}
-          {isExpired && (
-            <span className="text-xs px-2 py-0.5 bg-error/10 text-error rounded-sm">
-              Expired
-            </span>
-          )}
-        </div>
+      <PageHeader
+        title={share.title ?? "Untitled share"}
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Shares", href: "/admin/shares" },
+          { label: share.title ?? "Untitled" },
+        ]}
+      />
+
+      <div className="flex items-center gap-3 text-sm text-text-secondary">
+        <span className="font-mono text-xs">{url}</span>
+        {share.password_hash && (
+          <span className="text-xs px-2 py-0.5 bg-warning/10 text-warning rounded-sm">
+            Password
+          </span>
+        )}
+        {share.visibility === "public" ? (
+          <span className="text-xs px-2 py-0.5 bg-success/10 text-success rounded-sm">
+            Public
+          </span>
+        ) : (
+          <span className="text-xs px-2 py-0.5 bg-accent-subtle text-accent rounded-sm">
+            Authenticated
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -101,8 +91,8 @@ export default async function ShareDetailPage({
         <Stat label="Downloads" value={share.download_count} />
         <Stat label="Files" value={fileIds.length} />
         <Stat
-          label="Expires"
-          value={new Date(share.expires_at).toLocaleDateString()}
+          label="Created"
+          value={new Date(share.created_at).toLocaleDateString()}
         />
       </div>
 

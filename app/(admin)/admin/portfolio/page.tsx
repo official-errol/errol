@@ -7,23 +7,30 @@ import {
   GraduationIcon,
   CodeIcon,
   LinkIcon,
+  CertificateIcon,
+  TrophyIcon,
 } from "@/components/ui/icons";
 
 export default async function PortfolioOverviewPage() {
   const supabase = await createClient();
 
-  const [expCount, eduCount, skillCount, socialCount, profileRes] =
-    await Promise.all([
-      supabase.from("experiences").select("*", { count: "exact", head: true }),
-      supabase.from("education").select("*", { count: "exact", head: true }),
-      supabase.from("skills").select("*", { count: "exact", head: true }),
-      supabase.from("social_links").select("*", { count: "exact", head: true }),
-      supabase
-        .from("portfolio_profile")
-        .select("name, headline")
-        .limit(1)
-        .maybeSingle(),
-    ]);
+  const [
+    expCount,
+    eduCount,
+    certCount,
+    awardCount,
+    skillCount,
+    socialCount,
+    profileRes,
+  ] = await Promise.all([
+    supabase.from("experiences").select("*", { count: "exact", head: true }),
+    supabase.from("education").select("*", { count: "exact", head: true }),
+    supabase.from("certifications").select("*", { count: "exact", head: true }),
+    supabase.from("awards").select("*", { count: "exact", head: true }),
+    supabase.from("skills").select("*", { count: "exact", head: true }),
+    supabase.from("social_links").select("*", { count: "exact", head: true }),
+    supabase.from("portfolio_profile").select("name").limit(1).maybeSingle(),
+  ]);
 
   const sections = [
     {
@@ -43,9 +50,23 @@ export default async function PortfolioOverviewPage() {
     {
       href: "/admin/portfolio/education",
       label: "Education",
-      description: "Schools, degrees, certs",
+      description: "Schools, degrees, certifications",
       icon: GraduationIcon,
       count: `${eduCount.count ?? 0} entries`,
+    },
+    {
+      href: "/admin/portfolio/certifications",
+      label: "Certifications",
+      description: "Courses, exams, licenses",
+      icon: CertificateIcon,
+      count: `${certCount.count ?? 0} certifications`,
+    },
+    {
+      href: "/admin/portfolio/awards",
+      label: "Awards",
+      description: "Recognition and honors",
+      icon: TrophyIcon,
+      count: `${awardCount.count ?? 0} awards`,
     },
     {
       href: "/admin/portfolio/skills",
@@ -68,6 +89,10 @@ export default async function PortfolioOverviewPage() {
       <PageHeader
         title="Portfolio"
         description="Edit everything that appears on your public homepage."
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Portfolio" },
+        ]}
       />
 
       <div className="grid gap-4 md:grid-cols-2">

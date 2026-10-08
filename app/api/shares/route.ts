@@ -22,11 +22,10 @@ export async function POST(request: Request) {
   const isAdmin = profile?.role === "admin";
 
   const body = await request.json();
-  const { fileIds, visibility, title, expiresInHours, password } = body as {
+  const { fileIds, visibility, title, password } = body as {
     fileIds?: string[];
     visibility?: "public" | "authenticated";
     title?: string;
-    expiresInHours?: number;
     password?: string;
   };
 
@@ -52,7 +51,6 @@ export async function POST(request: Request) {
   }
 
   const vis = visibility === "public" ? "public" : "authenticated";
-  const hours = Math.min(Math.max(expiresInHours ?? 24, 1), 24 * 30);
 
   const { data: files, error: filesError } = await supabase
     .from("files")
@@ -79,7 +77,6 @@ export async function POST(request: Request) {
   }
 
   const token = generateToken();
-  const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
   const passwordHash = password ? await hashPassword(password) : null;
 
   const { data: share, error: shareError } = await supabase
@@ -89,7 +86,6 @@ export async function POST(request: Request) {
       created_by: user.id,
       visibility: vis,
       title: title?.trim() || null,
-      expires_at: expiresAt,
       password_hash: passwordHash,
     })
     .select()
@@ -103,6 +99,7 @@ export async function POST(request: Request) {
   }
 
   const rows = fileIds.map((file_id) => ({ share_id: share.id, file_id }));
+
   const { error: linkError } = await supabase.from("share_files").insert(rows);
 
   if (linkError) {

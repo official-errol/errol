@@ -13,7 +13,7 @@ export default async function AdminSharesPage() {
   const { data: shares } = await supabase
     .from("shares")
     .select(
-      "id, token, title, visibility, expires_at, view_count, download_count, revoked, created_at",
+      "id, token, title, visibility, view_count, download_count, revoked, created_at",
     )
     .order("created_at", { ascending: false });
 
@@ -36,6 +36,7 @@ export default async function AdminSharesPage() {
       <PageHeader
         title="Shares"
         description="Shareable links you've created."
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Shares" }]}
       />
 
       <SharesList shares={sharesWithCounts} />

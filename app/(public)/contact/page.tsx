@@ -1,12 +1,17 @@
+import type { Metadata } from "next";
 import { getProfile, getSocialLinks } from "@/lib/portfolio";
 import { resolveIcon } from "@/components/ui/icon-resolver";
 import { ContactForm } from "@/components/contact/contact-form";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
 import { MailIcon, MapPinIcon } from "@/components/ui/icons";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Contact",
-  description: "Get in touch.",
+  description:
+    "Get in touch with Errol. Questions, project inquiries, or just saying hello.",
+  alternates: {
+    canonical: "https://errolsolomon.vercel.app/contact",
+  },
 };
 
 export default async function ContactPage() {

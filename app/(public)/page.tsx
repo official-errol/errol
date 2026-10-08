@@ -4,6 +4,8 @@ import {
   getProfile,
   getExperiences,
   getEducation,
+  getCertifications,
+  getAwards,
   getSkillCategories,
   getSkills,
   getSocialLinks,
@@ -17,10 +19,14 @@ import {
   MailIcon,
   CalendarIcon,
   DownloadIcon,
+  CertificateIcon,
+  TrophyIcon,
+  ExternalIcon,
 } from "@/components/ui/icons";
 import { ProjectCard } from "@/components/projects/project-card";
 import { PostCard } from "@/components/blog/post-card";
 import { SectionPattern } from "@/components/ui/section-pattern";
+import { Metadata } from "next";
 
 function formatRange(
   start: string | null,
@@ -54,6 +60,15 @@ function SectionHeader({
   );
 }
 
+export const metadata: Metadata = {
+  title: "Errol — Developer, Builder, Problem Solver",
+  description:
+    "Portfolio, projects, and writing by Errol. A personal workshop for things worth building.",
+  alternates: {
+    canonical: "https://errolsolomon.vercel.app",
+  },
+};
+
 export default async function PortfolioPage() {
   const supabase = await createClient();
 
@@ -61,6 +76,8 @@ export default async function PortfolioPage() {
     profile,
     experiences,
     education,
+    certifications,
+    awards,
     categories,
     skills,
     socials,
@@ -70,6 +87,8 @@ export default async function PortfolioPage() {
     getProfile(),
     getExperiences(),
     getEducation(),
+    getCertifications(),
+    getAwards(),
     getSkillCategories(),
     getSkills(),
     getSocialLinks(),
@@ -88,8 +107,19 @@ export default async function PortfolioPage() {
       .limit(3),
   ]);
 
-  const latestPostIds = (latestPosts.data ?? []).map((p) => p.id);
+  const availabilityMeta = profile
+    ? {
+        available: { label: "Available for work", dot: "bg-success" },
+        open: { label: "Open to opportunities", dot: "bg-accent" },
+        unavailable: { label: "Not looking", dot: "bg-text-tertiary" },
+      }[profile.availability]
+    : null;
 
+  const hasSkills = categories.some((cat) =>
+    skills.some((s) => s.category_id === cat.id),
+  );
+
+  const latestPostIds = (latestPosts.data ?? []).map((p) => p.id);
   const latestCommentCounts: Record<string, number> = {};
   const latestReactionCounts: Record<
     string,
@@ -120,18 +150,6 @@ export default async function PortfolioPage() {
       }
     }
   }
-
-  const availabilityMeta = profile
-    ? {
-        available: { label: "Available for work", dot: "bg-success" },
-        open: { label: "Open to opportunities", dot: "bg-accent" },
-        unavailable: { label: "Not looking", dot: "bg-text-tertiary" },
-      }[profile.availability]
-    : null;
-
-  const hasSkills = categories.some((cat) =>
-    skills.some((s) => s.category_id === cat.id),
-  );
 
   return (
     <>
@@ -368,9 +386,169 @@ export default async function PortfolioPage() {
         </section>
       )}
 
-      {/* ───────────────────────────────── SKILLS — stripes */}
-      {hasSkills && (
+      {/* ───────────────────────────────── CERTIFICATIONS — stripes */}
+      {certifications.length > 0 && (
         <SectionPattern pattern="stripes">
+          <section className="py-20">
+            <div className="max-w-5xl mx-auto px-6">
+              <SectionHeader icon={CertificateIcon} title="Certifications" />
+
+              <div className="space-y-10">
+                {certifications.map((cert, i) => {
+                  const hasImage = Boolean(cert.image_url);
+                  return (
+                    <div key={cert.id} className="relative pl-8">
+                      <div
+                        className={`absolute left-0 w-2.5 h-2.5 -mt-1 rounded-full border-2 border-accent bg-background ${
+                          hasImage ? "top-[1.75rem]" : "top-[0.625rem]"
+                        }`}
+                      />
+                      {i < certifications.length - 1 && (
+                        <div
+                          className={`absolute left-[4px] bottom-[-2.5rem] w-px bg-border ${
+                            hasImage ? "top-[2rem]" : "top-[0.875rem]"
+                          }`}
+                        />
+                      )}
+
+                      <div
+                        className={`flex items-start ${
+                          hasImage ? "gap-4" : ""
+                        }`}
+                      >
+                        {cert.image_url && (
+                          <img
+                            src={cert.image_url}
+                            alt=""
+                            className="w-16 h-16 rounded-md border border-border object-cover shrink-0"
+                          />
+                        )}
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-1">
+                            <h3 className="text-lg font-semibold text-text-primary">
+                              {cert.name}
+                            </h3>
+                            {cert.year && (
+                              <span className="inline-flex items-center gap-1.5 text-xs text-text-tertiary font-mono">
+                                <CalendarIcon className="w-3.5 h-3.5" />
+                                {cert.year}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text-secondary mb-2">
+                            {cert.issuer && <span>{cert.issuer}</span>}
+                            {cert.credential_url && (
+                              <a
+                                href={cert.credential_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
+                              >
+                                Verify credential
+                                <ExternalIcon className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+
+                          {cert.description && (
+                            <p className="text-sm text-text-secondary leading-relaxed">
+                              {cert.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        </SectionPattern>
+      )}
+
+      {/* ───────────────────────────────── AWARDS — none */}
+      {awards.length > 0 && (
+        <section className="py-20">
+          <div className="max-w-5xl mx-auto px-6">
+            <SectionHeader icon={TrophyIcon} title="Awards" />
+
+            <div className="space-y-10">
+              {awards.map((award, i) => {
+                const hasImage = Boolean(award.image_url);
+                return (
+                  <div key={award.id} className="relative pl-8">
+                    <div
+                      className={`absolute left-0 w-2.5 h-2.5 -mt-1 rounded-full border-2 border-accent bg-background ${
+                        hasImage ? "top-[1.75rem]" : "top-[0.625rem]"
+                      }`}
+                    />
+                    {i < awards.length - 1 && (
+                      <div
+                        className={`absolute left-[4px] bottom-[-2.5rem] w-px bg-border ${
+                          hasImage ? "top-[2rem]" : "top-[0.875rem]"
+                        }`}
+                      />
+                    )}
+
+                    <div
+                      className={`flex items-start ${hasImage ? "gap-4" : ""}`}
+                    >
+                      {award.image_url && (
+                        <img
+                          src={award.image_url}
+                          alt=""
+                          className="w-16 h-16 rounded-md border border-border object-cover shrink-0"
+                        />
+                      )}
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-1">
+                          <h3 className="text-lg font-semibold text-text-primary">
+                            {award.title}
+                          </h3>
+                          {award.year && (
+                            <span className="inline-flex items-center gap-1.5 text-xs text-text-tertiary font-mono">
+                              <CalendarIcon className="w-3.5 h-3.5" />
+                              {award.year}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text-secondary mb-2">
+                          {award.issuer && <span>{award.issuer}</span>}
+                          {award.url && (
+                            <a
+                              href={award.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
+                            >
+                              Details
+                              <ExternalIcon className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+
+                        {award.description && (
+                          <p className="text-sm text-text-secondary leading-relaxed">
+                            {award.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ───────────────────────────────── SKILLS — cross */}
+      {hasSkills && (
+        <SectionPattern pattern="cross">
           <section className="py-20">
             <div className="max-w-5xl mx-auto px-6">
               <SectionHeader icon={CodeIcon} title="Skills" />
@@ -398,9 +576,9 @@ export default async function PortfolioPage() {
                               className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-surface border border-border rounded-md text-text-primary font-mono"
                             >
                               {Icon && (
-                                <Icon className="w-3.5 h-3.5 text-text-secondary" />
+                                <Icon className="w-3.5 h-3.5 text-text-secondary shrink-0" />
                               )}
-                              {skill.name}
+                              <span className="truncate">{skill.name}</span>
                             </span>
                           );
                         })}
@@ -451,9 +629,9 @@ export default async function PortfolioPage() {
         </section>
       )}
 
-      {/* ───────────────────────────────── LATEST POSTS — cross */}
+      {/* ───────────────────────────────── LATEST POSTS — waves */}
       {latestPosts.data && latestPosts.data.length > 0 && (
-        <SectionPattern pattern="cross">
+        <SectionPattern pattern="waves">
           <section className="py-20 pb-24">
             <div className="max-w-5xl mx-auto px-6">
               <SectionHeader

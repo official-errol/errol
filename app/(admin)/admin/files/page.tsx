@@ -1,12 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { getPreviewUrl } from "@/lib/storage";
 import { PageHeader } from "@/components/ui/page-header";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { FileList } from "@/components/admin/file-list";
 import { StorageUsage } from "@/components/admin/storage-usage";
 import { CreateShareButton } from "@/components/admin/create-share-button";
 import { UploadDialog } from "@/components/admin/upload-dialog";
-import { ShareIcon, UploadIcon } from "@/components/ui/icons";
+import { UploadIcon } from "@/components/ui/icons";
 
 const STORAGE_LIMIT_BYTES = 1024 * 1024 * 1024;
 
@@ -53,6 +53,7 @@ export default async function AdminFilesPage() {
       <PageHeader
         title="Files"
         description="Upload, manage, and monitor storage usage."
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Files" }]}
         action={
           <div className="flex gap-2">
             <CreateShareButton

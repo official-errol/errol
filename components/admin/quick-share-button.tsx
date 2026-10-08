@@ -15,7 +15,6 @@ type Props = {
 export function QuickShareButton({ fileId, filename, trigger }: Props) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [hours, setHours] = useState(24);
   const [visibility, setVisibility] = useState<"public" | "authenticated">(
     "authenticated",
   );
@@ -34,7 +33,6 @@ export function QuickShareButton({ fileId, filename, trigger }: Props) {
         body: JSON.stringify({
           fileIds: [fileId],
           visibility,
-          expiresInHours: hours,
           title: filename,
           password: password || undefined,
         }),
@@ -92,6 +90,9 @@ export function QuickShareButton({ fileId, filename, trigger }: Props) {
             <div className="p-4 space-y-3">
               {shareUrl ? (
                 <>
+                  <p className="text-xs text-text-secondary">
+                    This link never expires.
+                  </p>
                   <div className="flex gap-2">
                     <input
                       readOnly
@@ -116,20 +117,6 @@ export function QuickShareButton({ fileId, filename, trigger }: Props) {
                 </>
               ) : (
                 <>
-                  <div>
-                    <label className="block text-xs font-medium text-text-primary mb-1">
-                      Expires in (hours)
-                    </label>
-                    <input
-                      type="number"
-                      min={1}
-                      max={720}
-                      value={hours}
-                      onChange={(e) => setHours(parseInt(e.target.value) || 24)}
-                      className="w-full bg-surface border border-border rounded-sm px-3 py-2 text-sm"
-                    />
-                  </div>
-
                   <div>
                     <label className="block text-xs font-medium text-text-primary mb-1">
                       Access

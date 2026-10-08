@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://errol.vercel.app";
+const BASE_URL = "https://errolsolomon.vercel.app";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/api", "/auth", "/debug"],
+        disallow: ["/admin", "/api", "/auth", "/s/", "/debug"],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,

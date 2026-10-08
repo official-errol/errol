@@ -1,11 +1,16 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
 import { ProjectCard } from "@/components/projects/project-card";
 import { EmptyState } from "@/components/ui/empty-state";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Projects",
-  description: "Things built at Errol.",
+  description:
+    "Apps, tools, and experiments built by Errol. Web development, systems, and things worth shipping.",
+  alternates: {
+    canonical: "https://errolsolomon.vercel.app/projects",
+  },
 };
 
 type Project = {

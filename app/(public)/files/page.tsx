@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getPreviewUrl } from "@/lib/storage";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
@@ -7,9 +8,13 @@ import { ButtonLink } from "@/components/ui/button";
 import { DownloadIcon } from "@/components/ui/icons";
 import { SignInPrompt } from "@/components/auth/sign-in-prompt";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Files",
-  description: "Shared downloads from Errol.",
+  description:
+    "Shared downloads and resources from Errol. Documents, tools, and files available for public or authenticated download.",
+  alternates: {
+    canonical: "https://errolsolomon.vercel.app/files",
+  },
 };
 
 type FileRecord = {
@@ -68,6 +73,8 @@ export default async function FilesPage() {
     }),
   );
 
+  const hasLocked = files.some((f) => f.visibility !== "public");
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-16">
       <PublicPageHeader
@@ -76,7 +83,7 @@ export default async function FilesPage() {
         description="Shared downloads."
       />
 
-      {!user && files.some((f) => f.visibility === "authenticated") && (
+      {!user && hasLocked && (
         <SignInPrompt message="to access authenticated files" />
       )}
 

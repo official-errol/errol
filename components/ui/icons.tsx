@@ -1,5 +1,12 @@
 type IconProps = { className?: string };
 
+const S = {
+  stroke: "currentColor",
+  strokeWidth: 1.5,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
+
 export function EyeIcon({ className = "w-4 h-4" }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 16 16" fill="none">
@@ -588,6 +595,27 @@ export function SchoolIcon({ className = "w-4 h-4" }: IconProps) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+export function CertificateIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="2" width="12" height="9" rx="1" {...S} />
+      <path d="M5 5h6M5 7h4" {...S} />
+      <circle cx="11" cy="12" r="2" {...S} />
+      <path d="M10 13.5L9.5 15l1.5-.5L12.5 15l-.5-1.5" {...S} />
+    </svg>
+  );
+}
+
+export function TrophyIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <path d="M5 2h6v4a3 3 0 1 1-6 0V2Z" {...S} />
+      <path d="M5 3H3v1a2 2 0 0 0 2 2M11 3h2v1a2 2 0 0 1-2 2" {...S} />
+      <path d="M8 9v3M5 14h6M6 14v-2h4v2" {...S} />
     </svg>
   );
 }

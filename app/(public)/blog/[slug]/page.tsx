@@ -5,44 +5,64 @@ import { createClient } from "@/lib/supabase/server";
 import { CommentList, type Comment } from "@/components/blog/comment-list";
 import { CommentForm } from "@/components/blog/comment-form";
 import { ReactionButtons } from "@/components/blog/reaction-buttons";
+import { ShareButtons } from "@/components/blog/share-buttons";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
 import { SignInPrompt } from "@/components/auth/sign-in-prompt";
+import { Metadata } from "next";
+
+const BASE_URL = "https://errolsolomon.vercel.app";
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const supabase = await createClient();
   const { data: post } = await supabase
     .from("posts")
-    .select("title, excerpt, published_at")
+    .select("title, excerpt, cover_image_url, published_at")
     .eq("slug", slug)
     .eq("published", true)
     .single();
 
   if (!post) {
-    return { title: "Post not found" };
+    return {
+      title: "Post not found",
+      robots: { index: false, follow: false },
+    };
   }
+
+  const url = `https://errolsolomon.vercel.app/blog/${slug}`;
+  const image = post.cover_image_url || "/opengraph-image";
 
   return {
     title: post.title,
     description: post.excerpt ?? undefined,
     alternates: {
-      canonical: `https://errol.vercel.app/blog/${slug}`,
+      canonical: url,
     },
     openGraph: {
       title: post.title,
       description: post.excerpt ?? undefined,
       type: "article",
-      url: `https://errol.vercel.app/blog/${slug}`,
+      url,
+      siteName: "Errol",
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
       publishedTime: post.published_at ?? undefined,
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.excerpt ?? undefined,
+      images: [image],
     },
   };
 }
@@ -62,7 +82,7 @@ export default async function PostPage({
   const { data: post } = await supabase
     .from("posts")
     .select(
-      "id, slug, title, content, cover_image_url, published_at, author_id",
+      "id, slug, title, excerpt, content, cover_image_url, published_at, author_id",
     )
     .eq("slug", slug)
     .eq("published", true)
@@ -108,26 +128,29 @@ export default async function PostPage({
     .select("kind, user_id")
     .eq("post_id", post.id);
 
+  const postUrl = `${BASE_URL}/blog/${post.slug}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
+    description: post.excerpt ?? undefined,
     datePublished: post.published_at,
     dateModified: post.published_at,
     image: post.cover_image_url ?? undefined,
     author: {
       "@type": "Organization",
       name: "Errol",
-      url: "https://errol.vercel.app",
+      url: BASE_URL,
     },
     publisher: {
       "@type": "Organization",
       name: "Errol",
-      url: "https://errol.vercel.app",
+      url: BASE_URL,
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://errol.vercel.app/blog/${post.slug}`,
+      "@id": postUrl,
     },
   };
 
@@ -167,17 +190,25 @@ export default async function PostPage({
           />
         )}
 
-        <div className="prose prose-neutral max-w-none mb-12">
+        <div className="prose prose-neutral dark:prose-invert max-w-none mb-12">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {post.content}
           </ReactMarkdown>
         </div>
 
-        <ReactionButtons
-          postId={post.id}
-          reactions={reactions ?? []}
-          userId={user?.id ?? null}
-        />
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-6">
+          <ReactionButtons
+            postId={post.id}
+            reactions={reactions ?? []}
+            userId={user?.id ?? null}
+          />
+
+          <ShareButtons
+            url={postUrl}
+            title={post.title}
+            excerpt={post.excerpt ?? undefined}
+          />
+        </div>
 
         <section className="mt-16 pt-10 border-t border-border">
           <h2 className="text-xl font-semibold text-text-primary mb-6">

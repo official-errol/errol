@@ -19,6 +19,10 @@ export default async function AdminProjectsPage() {
       <PageHeader
         title="Projects"
         description="Showcase what you've built."
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Projects" },
+        ]}
         action={
           <ButtonLink href="/admin/projects/new">
             <PlusIcon />

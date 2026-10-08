@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms for using Errol.",
+  description:
+    "Terms for using Errol — what the site is, what you can post, and how disputes are handled.",
+  alternates: {
+    canonical: "https://errolsolomon.vercel.app/terms",
+  },
 };
 
 export default function TermsPage() {

@@ -8,7 +8,6 @@ import {
 } from "@/lib/share";
 import { getPreviewUrl } from "@/lib/storage";
 import { FilePreview } from "@/components/files/file-preview";
-import { ShareExpiry } from "@/components/share/share-expiry";
 import { SharePasswordForm } from "@/components/share/share-password-form";
 import { SignInPrompt } from "@/components/auth/sign-in-prompt";
 
@@ -97,8 +96,7 @@ export default async function SharePage({
         </h1>
         <p className="text-sm text-text-secondary">
           {share.files.length} file{share.files.length === 1 ? "" : "s"} ·{" "}
-          {formatBytes(totalBytes)} ·{" "}
-          <ShareExpiry expiresAt={share.expires_at} />
+          {formatBytes(totalBytes)}
         </p>
       </div>
 

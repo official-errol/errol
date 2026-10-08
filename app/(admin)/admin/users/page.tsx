@@ -18,6 +18,7 @@ export default async function AdminUsersPage() {
       <PageHeader
         title="Users"
         description={`${users?.length ?? 0} registered user${users?.length === 1 ? "" : "s"}.`}
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Users" }]}
       />
 
       <UserList users={users ?? []} currentUserId={currentUser?.id ?? null} />

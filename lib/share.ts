@@ -28,7 +28,6 @@ export type ShareRecord = {
   created_by: string;
   visibility: "public" | "authenticated";
   title: string | null;
-  expires_at: string;
   view_count: number;
   download_count: number;
   revoked: boolean;
@@ -58,14 +57,13 @@ export async function getShareByToken(
   const { data: share, error } = await supabase
     .from("shares")
     .select(
-      "id, token, created_by, visibility, title, expires_at, view_count, download_count, revoked, created_at, password_hash",
+      "id, token, created_by, visibility, title, view_count, download_count, revoked, created_at, password_hash",
     )
     .eq("token", token)
     .eq("revoked", false)
     .single();
 
   if (error || !share) return null;
-  if (new Date(share.expires_at).getTime() < Date.now()) return null;
 
   const { data: links } = await supabase
     .from("share_files")

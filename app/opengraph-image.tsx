@@ -12,7 +12,8 @@ export default async function Image() {
         width: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
+        justifyContent: "center",
+        alignItems: "flex-start",
         padding: "80px",
         background: "#FAFAF8",
         fontFamily: "system-ui, sans-serif",
@@ -20,57 +21,33 @@ export default async function Image() {
     >
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "16px",
+          fontSize: "28px",
           color: "#6C7278",
-          fontSize: "24px",
+          marginBottom: "24px",
+          fontFamily: "monospace",
         }}
       >
-        <div
-          style={{
-            width: "12px",
-            height: "12px",
-            borderRadius: "9999px",
-            background: "#3B82F6",
-          }}
-        />
-        errol.is-a.dev
+        errolsolomon.vercel.app
       </div>
-
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        <div
-          style={{
-            fontSize: "72px",
-            fontWeight: 700,
-            color: "#1A1C1E",
-            lineHeight: 1.1,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          A personal workshop for
-        </div>
-        <div
-          style={{
-            fontSize: "72px",
-            fontWeight: 700,
-            color: "#1A1C1E",
-            lineHeight: 1.1,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          things worth building.
-        </div>
-      </div>
-
       <div
         style={{
-          display: "flex",
-          fontSize: "24px",
-          color: "#6C7278",
+          fontSize: "96px",
+          fontWeight: 700,
+          color: "#1A1C1E",
+          lineHeight: 1.05,
+          letterSpacing: "-0.02em",
         }}
       >
-        Projects · Writing · Files
+        Errol
+      </div>
+      <div
+        style={{
+          fontSize: "32px",
+          color: "#6C7278",
+          marginTop: "16px",
+        }}
+      >
+        Developer · Builder · Problem Solver
       </div>
     </div>,
     { ...size },

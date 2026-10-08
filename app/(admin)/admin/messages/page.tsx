@@ -20,6 +20,10 @@ export default async function MessagesPage() {
             ? `${unread} unread message${unread === 1 ? "" : "s"}.`
             : "Messages from your contact form."
         }
+        breadcrumbs={[
+          { label: "Admin", href: "/admin" },
+          { label: "Messages" },
+        ]}
       />
       <MessagesList messages={data ?? []} />
     </div>

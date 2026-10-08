@@ -1,11 +1,16 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
 import { PostCard } from "@/components/blog/post-card";
 import { EmptyState } from "@/components/ui/empty-state";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Blog",
-  description: "Writing from Errol.",
+  description:
+    "Notes, thoughts, and things I have learned while building software and side projects.",
+  alternates: {
+    canonical: "https://errolsolomon.vercel.app/blog",
+  },
 };
 
 type Post = {

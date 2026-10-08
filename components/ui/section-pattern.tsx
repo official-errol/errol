@@ -1,4 +1,4 @@
-type Pattern = "none" | "dots" | "grid" | "stripes" | "cross";
+type Pattern = "none" | "dots" | "grid" | "stripes" | "cross" | "waves";
 
 export function SectionPattern({
   pattern = "none",
@@ -67,6 +67,16 @@ function styleFor(pattern: Pattern): React.CSSProperties {
             transparent 14px
           )
         `,
+      };
+    case "waves":
+      return {
+        backgroundImage: `repeating-linear-gradient(
+          0deg,
+          ${line} 0px,
+          ${line} 1px,
+          transparent 1px,
+          transparent 24px
+        )`,
       };
     default:
       return {};

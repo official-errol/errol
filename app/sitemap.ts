@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 
-const BASE_URL = "https://errol.vercel.app";
+const BASE_URL = "https://errolsolomon.vercel.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();
@@ -27,12 +27,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${BASE_URL}/about`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
       url: `${BASE_URL}/projects`,
       lastModified: new Date(),
       changeFrequency: "weekly",
@@ -49,6 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
     },
     {
       url: `${BASE_URL}/privacy`,

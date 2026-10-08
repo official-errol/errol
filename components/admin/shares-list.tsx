@@ -14,7 +14,6 @@ type Share = {
   token: string;
   title: string | null;
   visibility: string;
-  expires_at: string;
   view_count: number;
   download_count: number;
   revoked: boolean;
@@ -49,10 +48,6 @@ export function SharesList({ shares }: { shares: Share[] }) {
     }
   }
 
-  function isExpired(expiresAt: string) {
-    return new Date(expiresAt).getTime() < Date.now();
-  }
-
   async function copy(token: string) {
     const url = `${window.location.origin}/s/${token}`;
     await navigator.clipboard.writeText(url);
@@ -76,84 +71,77 @@ export function SharesList({ shares }: { shares: Share[] }) {
             <tr className="text-left text-xs uppercase tracking-wide text-text-secondary">
               <th className="px-4 py-3 font-medium">Share</th>
               <th className="px-4 py-3 font-medium">Access</th>
-              <th className="px-4 py-3 font-medium">Expires</th>
               <th className="px-4 py-3 font-medium">Stats</th>
+              <th className="px-4 py-3 font-medium">Created</th>
               <th className="px-4 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {shares.map((share) => {
-              const expired = isExpired(share.expires_at);
-              return (
-                <tr key={share.id} className="border-t border-border">
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/shares/${share.id}`}
-                      className="text-sm text-text-primary hover:text-accent"
+            {shares.map((share) => (
+              <tr key={share.id} className="border-t border-border">
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/admin/shares/${share.id}`}
+                    className="text-sm text-text-primary hover:text-accent"
+                  >
+                    {share.title ?? "Untitled share"}
+                  </Link>
+                  <div className="text-xs text-text-tertiary mt-0.5">
+                    {share.fileCount} file{share.fileCount === 1 ? "" : "s"}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-sm ${
+                      share.visibility === "public"
+                        ? "bg-success/10 text-success"
+                        : "bg-accent-subtle text-accent"
+                    }`}
+                  >
+                    {share.visibility}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-xs text-text-secondary">
+                  {share.view_count} views · {share.download_count} downloads
+                </td>
+                <td className="px-4 py-3 text-sm text-text-secondary">
+                  {new Date(share.created_at).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-1.5">
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => copy(share.token)}
+                      className="!px-2"
+                      title="Copy link"
                     >
-                      {share.title ?? "Untitled share"}
-                    </Link>
-                    <div className="text-xs text-text-tertiary mt-0.5">
-                      {share.fileCount} file{share.fileCount === 1 ? "" : "s"}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-sm ${
-                        share.visibility === "public"
-                          ? "bg-success/10 text-success"
-                          : "bg-accent-subtle text-accent"
-                      }`}
+                      <CopyIcon />
+                    </Button>
+                    <ButtonLink
+                      href={`/s/${share.token}`}
+                      variant="ghost"
+                      size="xs"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="!px-2"
+                      title="Open"
                     >
-                      {share.visibility}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-text-secondary">
-                    {expired ? (
-                      <span className="text-error">Expired</span>
-                    ) : (
-                      new Date(share.expires_at).toLocaleString()
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-text-secondary">
-                    {share.view_count} views · {share.download_count} downloads
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        onClick={() => copy(share.token)}
-                        className="!px-2"
-                        title="Copy link"
-                      >
-                        <CopyIcon />
-                      </Button>
-                      <ButtonLink
-                        href={`/s/${share.token}`}
-                        variant="ghost"
-                        size="xs"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="!px-2"
-                        title="Open"
-                      >
-                        <ExternalIcon />
-                      </ButtonLink>
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        onClick={() => setTarget(share)}
-                        className="!px-2 text-error hover:text-error hover:bg-error/10"
-                        title="Revoke"
-                      >
-                        <XIcon />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+                      <ExternalIcon />
+                    </ButtonLink>
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => setTarget(share)}
+                      className="!px-2 text-error hover:text-error hover:bg-error/10"
+                      title="Revoke"
+                    >
+                      <XIcon />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

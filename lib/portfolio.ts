@@ -117,3 +117,46 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
     .order("sort_order", { ascending: false });
   return data ?? [];
 }
+
+export type Certification = {
+  id: string;
+  name: string;
+  issuer: string | null;
+  year: number | null;
+  credential_id: string | null;
+  credential_url: string | null;
+  image_url: string | null;
+  description: string | null;
+  sort_order: number;
+};
+
+export type Award = {
+  id: string;
+  title: string;
+  issuer: string | null;
+  year: number | null;
+  description: string | null;
+  url: string | null;
+  image_url: string | null;
+  sort_order: number;
+};
+
+export async function getCertifications(): Promise<Certification[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("certifications")
+    .select("*")
+    .order("sort_order", { ascending: false })
+    .order("year", { ascending: false, nullsFirst: false });
+  return data ?? [];
+}
+
+export async function getAwards(): Promise<Award[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("awards")
+    .select("*")
+    .order("sort_order", { ascending: false })
+    .order("year", { ascending: false, nullsFirst: false });
+  return data ?? [];
+}

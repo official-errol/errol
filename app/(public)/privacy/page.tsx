@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { PublicPageHeader } from "@/components/ui/public-page-header";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How Errol handles your data.",
+  description:
+    "How Errol handles your data — what is collected, why, and what control you have.",
+  alternates: {
+    canonical: "https://errolsolomon.vercel.app/privacy",
+  },
 };
 
 export default function PrivacyPage() {
