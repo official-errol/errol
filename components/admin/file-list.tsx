@@ -80,7 +80,8 @@ export function FileList({ files }: { files: FileRecord[] }) {
 
   return (
     <>
-      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      {/* Desktop table */}
+      <div className="hidden md:block bg-surface border border-border rounded-lg overflow-hidden">
         <table className="w-full">
           <thead className="bg-surface-subtle">
             <tr className="text-left text-xs uppercase tracking-wide text-text-secondary">
@@ -146,6 +147,7 @@ export function FileList({ files }: { files: FileRecord[] }) {
                       size="xs"
                       onClick={() => setTarget(file)}
                       className="!px-2 text-error hover:text-error hover:bg-error/10"
+                      title="Delete"
                     >
                       <TrashIcon />
                     </Button>
@@ -155,6 +157,70 @@ export function FileList({ files }: { files: FileRecord[] }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {files.map((file) => (
+          <div
+            key={file.id}
+            className="bg-surface border border-border rounded-lg p-4"
+          >
+            <div className="flex items-start gap-3 mb-3">
+              <FilePreview
+                mimeType={file.mime_type}
+                previewUrl={file.previewUrl}
+                filename={file.filename}
+                size="md"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-text-primary truncate font-mono">
+                  {file.filename}
+                </p>
+                {file.description && (
+                  <p className="text-xs text-text-secondary mt-0.5 line-clamp-2">
+                    {file.description}
+                  </p>
+                )}
+                <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                  <span className="text-xs text-text-tertiary">
+                    {formatBytes(file.size_bytes)}
+                  </span>
+                  <span
+                    className={`text-xs px-1.5 py-0.5 rounded-sm ${
+                      VISIBILITY_STYLE[file.visibility] ??
+                      VISIBILITY_STYLE.private
+                    }`}
+                  >
+                    {file.visibility}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-3 border-t border-border">
+              <QuickShareButton
+                fileId={file.id}
+                filename={file.filename}
+                trigger={
+                  <Button variant="ghost" size="xs">
+                    <ShareIcon />
+                    Share
+                  </Button>
+                }
+              />
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setTarget(file)}
+                className="ml-auto text-error hover:text-error hover:bg-error/10"
+              >
+                <TrashIcon />
+                Delete
+              </Button>
+            </div>
+          </div>
+        ))}
       </div>
 
       <ConfirmDialog

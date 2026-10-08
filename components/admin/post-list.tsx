@@ -6,17 +6,31 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
-import { EyeIcon, PencilIcon, TrashIcon } from "@/components/ui/icons";
+import {
+  EyeIcon,
+  PencilIcon,
+  TrashIcon,
+  CalendarIcon,
+} from "@/components/ui/icons";
 
 type Post = {
   id: string;
   slug: string;
   title: string;
+  cover_image_url: string | null;
   published: boolean;
   published_at: string | null;
   created_at: string;
   updated_at: string;
 };
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 export function PostList({ posts }: { posts: Post[] }) {
   const router = useRouter();
@@ -60,10 +74,12 @@ export function PostList({ posts }: { posts: Post[] }) {
 
   return (
     <>
-      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      {/* Desktop table */}
+      <div className="hidden md:block bg-surface border border-border rounded-lg overflow-hidden">
         <table className="w-full">
           <thead className="bg-surface-subtle">
             <tr className="text-left text-xs uppercase tracking-wide text-text-secondary">
+              <th className="px-4 py-3 font-medium w-20">Cover</th>
               <th className="px-4 py-3 font-medium">Title</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Updated</th>
@@ -73,6 +89,17 @@ export function PostList({ posts }: { posts: Post[] }) {
           <tbody>
             {posts.map((post) => (
               <tr key={post.id} className="border-t border-border">
+                <td className="px-4 py-3">
+                  {post.cover_image_url ? (
+                    <img
+                      src={post.cover_image_url}
+                      alt=""
+                      className="w-12 h-12 rounded-md border border-border object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-md bg-surface-subtle border border-border" />
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   <div className="text-sm text-text-primary">{post.title}</div>
                   <div className="text-xs text-text-tertiary font-mono">
@@ -91,7 +118,7 @@ export function PostList({ posts }: { posts: Post[] }) {
                   )}
                 </td>
                 <td className="px-4 py-3 text-sm text-text-secondary">
-                  {new Date(post.updated_at).toLocaleDateString()}
+                  {formatDate(post.updated_at)}
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-1.5">
@@ -132,6 +159,83 @@ export function PostList({ posts }: { posts: Post[] }) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {posts.map((post) => (
+          <div
+            key={post.id}
+            className="bg-surface border border-border rounded-lg overflow-hidden"
+          >
+            {post.cover_image_url && (
+              <img
+                src={post.cover_image_url}
+                alt=""
+                className="w-full aspect-video object-cover border-b border-border"
+              />
+            )}
+
+            <div className="p-4 space-y-3">
+              <div>
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h3 className="text-sm font-semibold text-text-primary">
+                    {post.title}
+                  </h3>
+                  {post.published ? (
+                    <span className="text-xs px-2 py-0.5 bg-success/10 text-success rounded-sm shrink-0">
+                      Published
+                    </span>
+                  ) : (
+                    <span className="text-xs px-2 py-0.5 bg-surface-subtle text-text-secondary rounded-sm shrink-0">
+                      Draft
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-text-tertiary font-mono truncate">
+                  /{post.slug}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-xs text-text-tertiary">
+                <CalendarIcon className="w-3.5 h-3.5" />
+                {formatDate(post.updated_at)}
+              </div>
+
+              <div className="flex items-center gap-2 pt-2 border-t border-border">
+                {post.published && (
+                  <ButtonLink
+                    href={`/blog/${post.slug}`}
+                    variant="ghost"
+                    size="xs"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <EyeIcon />
+                    View
+                  </ButtonLink>
+                )}
+                <ButtonLink
+                  href={`/admin/posts/${post.id}`}
+                  variant="ghost"
+                  size="xs"
+                >
+                  <PencilIcon />
+                  Edit
+                </ButtonLink>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={() => setTarget(post)}
+                  className="ml-auto text-error hover:text-error hover:bg-error/10"
+                >
+                  <TrashIcon />
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       <ConfirmDialog

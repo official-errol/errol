@@ -55,7 +55,7 @@ export default async function AdminFilesPage() {
         description="Upload, manage, and monitor storage usage."
         breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Files" }]}
         action={
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto sm:justify-end">
             <CreateShareButton
               files={files.map((f) => ({
                 id: f.id,

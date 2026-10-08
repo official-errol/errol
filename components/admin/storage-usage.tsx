@@ -21,20 +21,22 @@ export function StorageUsage({
   const remaining = Math.max(0, limitBytes - totalBytes);
 
   return (
-    <div className="bg-surface border border-border rounded-lg p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <HardDriveIcon className="w-4 h-4 text-text-secondary" />
-          <h2 className="text-sm font-medium text-text-primary">
+    <div className="bg-surface border border-border rounded-lg p-4 sm:p-6">
+      {/* Header row */}
+      <div className="flex items-center justify-between gap-3 mb-3 sm:mb-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <HardDriveIcon className="w-4 h-4 text-text-secondary shrink-0" />
+          <h2 className="text-sm font-medium text-text-primary truncate">
             Storage usage
           </h2>
         </div>
-        <span className="text-sm text-text-secondary font-mono">
+        <span className="text-xs sm:text-sm text-text-secondary font-mono whitespace-nowrap">
           {formatBytes(totalBytes)} / {formatBytes(limitBytes)}
         </span>
       </div>
 
-      <div className="w-full h-2 bg-surface-subtle rounded-full overflow-hidden mb-3">
+      {/* Progress bar */}
+      <div className="w-full h-2 bg-surface-subtle rounded-full overflow-hidden mb-2 sm:mb-3">
         <div
           className={`h-full transition-all ${
             critical ? "bg-error" : warning ? "bg-warning" : "bg-accent"
@@ -43,9 +45,10 @@ export function StorageUsage({
         />
       </div>
 
-      <div className="flex items-center justify-between text-xs text-text-tertiary">
+      {/* Footer row */}
+      <div className="flex items-center justify-between text-xs text-text-tertiary gap-3">
         <span>{pct.toFixed(1)}% used</span>
-        <span>{formatBytes(remaining)} remaining</span>
+        <span className="truncate">{formatBytes(remaining)} remaining</span>
       </div>
     </div>
   );

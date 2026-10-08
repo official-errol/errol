@@ -35,14 +35,16 @@ export function PageHeader({
         </a>
       ) : null}
 
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          <h1 className="text-3xl font-semibold text-text-primary">{title}</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold text-text-primary">
+            {title}
+          </h1>
           {description && (
             <p className="text-sm text-text-secondary mt-1">{description}</p>
           )}
         </div>
-        {action && <div className="shrink-0">{action}</div>}
+        {action && <div className="w-full md:w-auto md:shrink-0">{action}</div>}
       </div>
     </div>
   );

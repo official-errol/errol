@@ -10,7 +10,7 @@ export default async function AdminProjectsPage() {
   const { data: projects } = await supabase
     .from("projects")
     .select(
-      "id, slug, title, status, featured, tech_stack, created_at, updated_at",
+      "id, slug, title, cover_image_url, status, featured, tech_stack, created_at, updated_at",
     )
     .order("created_at", { ascending: false });
 
