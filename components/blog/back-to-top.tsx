@@ -26,7 +26,7 @@ export function BackToTop() {
       onClick={handleClick}
       aria-label="Back to top"
       title="Back to top"
-      className={`fixed bottom-6 right-6 lg:right-[max(1.5rem,calc(50%-18rem))] z-40 p-3 rounded-full bg-surface border border-border shadow-lg text-text-primary transition-all duration-200 hover:bg-surface-subtle hover:border-border-strong ${
+      className={`fixed bottom-6 right-6 z-40 p-3 rounded-full bg-surface border border-border shadow-lg text-text-primary transition-all duration-200 hover:bg-surface-subtle hover:border-border-strong ${
         visible
           ? "opacity-100 translate-y-0 pointer-events-auto"
           : "opacity-0 translate-y-2 pointer-events-none"

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PublicNav } from "@/components/layout/public-nav";
 import { AutoOpenLogin } from "@/components/auth/auto-open-login";
 import { BackToTop } from "@/components/blog/back-to-top";
+import { SiteBanner } from "@/components/layout/site-banner";
 
 export default async function PublicLayout({
   children,
@@ -25,6 +26,14 @@ export default async function PublicLayout({
     profile = data;
   }
 
+  const { data: banner } = await supabase
+    .from("site_banner")
+    .select(
+      "id, enabled, message, link_text, link_url, variant, dismissible, updated_at",
+    )
+    .limit(1)
+    .maybeSingle();
+
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -35,6 +44,8 @@ export default async function PublicLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SiteBanner banner={banner} />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
@@ -54,12 +65,15 @@ export default async function PublicLayout({
       <footer className="border-t border-border bg-surface">
         <div className="max-w-5xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-text-secondary">
           <p>© {new Date().getFullYear()} Errol</p>
-          <div className="flex flex-wrap gap-6">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
             <Link href="/projects" className="hover:text-text-primary">
               Projects
             </Link>
             <Link href="/blog" className="hover:text-text-primary">
               Blog
+            </Link>
+            <Link href="/shop" className="hover:text-text-primary">
+              Shop
             </Link>
             <Link href="/files" className="hover:text-text-primary">
               Files
