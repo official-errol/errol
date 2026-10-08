@@ -27,6 +27,7 @@ import { ProjectCard } from "@/components/projects/project-card";
 import { PostCard } from "@/components/blog/post-card";
 import { SectionPattern } from "@/components/ui/section-pattern";
 import { Metadata } from "next";
+import { getReadingTime } from "@/lib/reading-time";
 
 function formatRange(
   start: string | null,
@@ -101,7 +102,9 @@ export default async function PortfolioPage() {
       .limit(3),
     supabase
       .from("posts")
-      .select("id, slug, title, excerpt, cover_image_url, published_at")
+      .select(
+        "id, slug, title, excerpt, content, cover_image_url, published_at, tags",
+      )
       .eq("published", true)
       .order("published_at", { ascending: false })
       .limit(3),
@@ -658,8 +661,10 @@ export default async function PortfolioPage() {
                       excerpt: post.excerpt,
                       cover_image_url: post.cover_image_url,
                       published_at: post.published_at,
+                      reading_minutes: getReadingTime(post.content),
                       comment_count: latestCommentCounts[post.id] ?? 0,
                       reactions: latestReactionCounts[post.id],
+                      tags: post.tags ?? [],
                     }}
                   />
                 ))}

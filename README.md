@@ -4,7 +4,7 @@ A personal multi-purpose platform: portfolio, blog, file sharing, and community 
 
 ## Live Site
 
-https://errol.vercel.app
+https://errolsolomon.vercel.app
 
 ## Tech Stack
 

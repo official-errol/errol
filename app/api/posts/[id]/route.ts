@@ -36,7 +36,7 @@ export async function PUT(
   if (error) return NextResponse.json({ error }, { status });
 
   const body = await request.json();
-  const { title, slug, excerpt, content, cover_image_url, published } =
+  const { title, slug, excerpt, content, cover_image_url, published, tags } =
     body as {
       title?: string;
       slug?: string;
@@ -44,6 +44,7 @@ export async function PUT(
       content?: string;
       cover_image_url?: string;
       published?: boolean;
+      tags?: string[];
     };
 
   if (!title?.trim() || !content?.trim() || !slug?.trim()) {
@@ -63,6 +64,13 @@ export async function PUT(
       ? new Date().toISOString()
       : (existing?.published_at ?? null);
 
+  const cleanTags = Array.isArray(tags)
+    ? tags
+        .map((t) => t.trim())
+        .filter(Boolean)
+        .slice(0, 10)
+    : [];
+
   const { data, error: updateError } = await supabase
     .from("posts")
     .update({
@@ -73,6 +81,7 @@ export async function PUT(
       cover_image_url: cover_image_url?.trim() || null,
       published: isPublished,
       published_at: publishedAt,
+      tags: cleanTags,
     })
     .eq("id", id)
     .select()

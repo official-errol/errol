@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLogin } from "@/components/auth/login-dialog-provider";
+import { SearchIcon } from "@/components/ui/icons";
 
 type Props = {
   user: { id: string; email: string } | null;
@@ -75,6 +76,15 @@ export function PublicNav({ user, profile }: Props) {
         </nav>
 
         <div className="flex items-center gap-1">
+          <Link
+            href="/search"
+            className="inline-flex p-2 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors"
+            title="Search"
+            aria-label="Search"
+          >
+            <SearchIcon />
+          </Link>
+
           <ThemeToggle />
 
           <div className="hidden md:flex items-center relative">

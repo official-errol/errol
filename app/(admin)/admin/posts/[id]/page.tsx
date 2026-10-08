@@ -13,7 +13,9 @@ export default async function EditPostPage({
 
   const { data: post } = await supabase
     .from("posts")
-    .select("id, title, slug, excerpt, content, cover_image_url, published")
+    .select(
+      "id, title, slug, excerpt, content, cover_image_url, published, tags",
+    )
     .eq("id", id)
     .single();
 
@@ -30,7 +32,6 @@ export default async function EditPostPage({
           { label: post.title },
         ]}
       />
-
       <PostForm
         initial={{
           id: post.id,
@@ -40,6 +41,7 @@ export default async function EditPostPage({
           content: post.content,
           cover_image_url: post.cover_image_url ?? "",
           published: post.published,
+          tags: post.tags ?? [],
         }}
       />
     </div>

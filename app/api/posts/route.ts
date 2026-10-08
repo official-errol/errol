@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, slug, excerpt, content, cover_image_url, published } =
+  const { title, slug, excerpt, content, cover_image_url, published, tags } =
     body as {
       title?: string;
       slug?: string;
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
       content?: string;
       cover_image_url?: string;
       published?: boolean;
+      tags?: string[];
     };
 
   if (!title?.trim() || !content?.trim()) {
@@ -58,6 +59,12 @@ export async function POST(request: Request) {
   }
 
   const isPublished = Boolean(published);
+  const cleanTags = Array.isArray(tags)
+    ? tags
+        .map((t) => t.trim())
+        .filter(Boolean)
+        .slice(0, 10)
+    : [];
 
   const { data, error } = await supabase
     .from("posts")
@@ -70,6 +77,7 @@ export async function POST(request: Request) {
       cover_image_url: cover_image_url?.trim() || null,
       published: isPublished,
       published_at: isPublished ? new Date().toISOString() : null,
+      tags: cleanTags,
     })
     .select()
     .single();

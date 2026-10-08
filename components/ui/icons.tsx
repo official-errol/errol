@@ -557,20 +557,6 @@ export function HomeIcon({ className = "w-4 h-4" }: IconProps) {
   );
 }
 
-export function SearchIcon({ className = "w-4 h-4" }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 16 16" fill="none">
-      <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.25" />
-      <path
-        d="M10.5 10.5l3 3"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
 export function SchoolIcon({ className = "w-4 h-4" }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 16 16" fill="none">
@@ -616,6 +602,29 @@ export function TrophyIcon({ className = "w-4 h-4" }: IconProps) {
       <path d="M5 2h6v4a3 3 0 1 1-6 0V2Z" {...S} />
       <path d="M5 3H3v1a2 2 0 0 0 2 2M11 3h2v1a2 2 0 0 1-2 2" {...S} />
       <path d="M8 9v3M5 14h6M6 14v-2h4v2" {...S} />
+    </svg>
+  );
+}
+
+export function RssIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <circle cx="4" cy="12" r="1.5" fill="currentColor" />
+      <path
+        d="M3 7a6 6 0 0 1 6 6M3 3a10 10 0 0 1 10 10"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function SearchIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <circle cx="7" cy="7" r="4.5" {...S} />
+      <path d="M10.5 10.5l3 3" {...S} />
     </svg>
   );
 }

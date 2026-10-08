@@ -60,6 +60,7 @@
 
 html {
   color-scheme: light;
+  scroll-behavior: smooth;
 }
 
 html.dark {
@@ -94,4 +95,8 @@ body {
   --tw-prose-pre-bg: var(--color-surface-elevated);
   --tw-prose-th-borders: var(--color-border);
   --tw-prose-td-borders: var(--color-border);
+}
+
+.prose :where(h2, h3, h4) {
+  scroll-margin-top: 6rem;
 }

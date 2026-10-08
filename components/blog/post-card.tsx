@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CalendarIcon, MessageIcon } from "@/components/ui/icons";
+import { TagChips } from "./tag-chips";
 
 type ReactionCounts = {
   like: number;
@@ -14,8 +15,10 @@ type Post = {
   excerpt: string | null;
   cover_image_url: string | null;
   published_at: string | null;
+  reading_minutes?: number;
   comment_count?: number;
   reactions?: ReactionCounts;
+  tags?: string[];
 };
 
 const REACTION_EMOJI = {
@@ -30,31 +33,40 @@ export function PostCard({ post }: { post: Post }) {
     : 0;
 
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-border-strong transition-colors flex flex-col"
-    >
-      {post.cover_image_url ? (
-        <img
-          src={post.cover_image_url}
-          alt=""
-          className="w-full aspect-video object-cover border-b border-border"
-        />
-      ) : (
-        <div className="w-full aspect-video bg-surface-subtle border-b border-border flex items-center justify-center">
-          <span className="text-xs text-text-tertiary font-mono">no cover</span>
-        </div>
-      )}
+    <article className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-border-strong transition-colors flex flex-col">
+      <Link href={`/blog/${post.slug}`} className="block">
+        {post.cover_image_url ? (
+          <img
+            src={post.cover_image_url}
+            alt=""
+            className="w-full aspect-video object-cover border-b border-border"
+          />
+        ) : (
+          <div className="w-full aspect-video bg-surface-subtle border-b border-border flex items-center justify-center">
+            <span className="text-xs text-text-tertiary font-mono">
+              no cover
+            </span>
+          </div>
+        )}
+      </Link>
 
       <div className="p-6 flex-1 flex flex-col">
-        <h3 className="font-semibold text-text-primary group-hover:text-accent transition-colors mb-2">
-          {post.title}
-        </h3>
+        <Link href={`/blog/${post.slug}`} className="block">
+          <h3 className="font-semibold text-text-primary group-hover:text-accent transition-colors mb-2">
+            {post.title}
+          </h3>
+        </Link>
 
         {post.excerpt && (
           <p className="text-sm text-text-secondary line-clamp-3 mb-4">
             {post.excerpt}
           </p>
+        )}
+
+        {post.tags && post.tags.length > 0 && (
+          <div className="mb-4">
+            <TagChips tags={post.tags.slice(0, 3)} />
+          </div>
         )}
 
         <div className="flex items-center justify-between gap-3 mt-auto pt-2">
@@ -70,6 +82,8 @@ export function PostCard({ post }: { post: Post }) {
           )}
 
           <div className="flex items-center gap-2.5 text-xs text-text-tertiary">
+            {post.reading_minutes && <span>{post.reading_minutes} min</span>}
+
             {post.comment_count !== undefined && (
               <span className="inline-flex items-center gap-1">
                 <MessageIcon className="w-3.5 h-3.5" />
@@ -98,6 +112,6 @@ export function PostCard({ post }: { post: Post }) {
           </div>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

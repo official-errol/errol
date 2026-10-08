@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [postsRes, projectsRes] = await Promise.all([
     supabase
       .from("posts")
-      .select("slug, updated_at, published_at")
+      .select("slug, updated_at, published_at, tags")
       .eq("published", true)
       .order("published_at", { ascending: false }),
     supabase
@@ -80,5 +80,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  return [...staticRoutes, ...postRoutes, ...projectRoutes];
+  // Distinct tags
+  const tags = new Set<string>();
+  for (const p of postsRes.data ?? []) {
+    for (const t of p.tags ?? []) tags.add(t);
+  }
+
+  const tagRoutes: MetadataRoute.Sitemap = Array.from(tags).map((tag) => ({
+    url: `${BASE_URL}/blog?tag=${encodeURIComponent(tag)}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.5,
+  }));
+
+  return [...staticRoutes, ...postRoutes, ...projectRoutes, ...tagRoutes];
 }

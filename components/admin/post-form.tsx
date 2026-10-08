@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { ImageUpload } from "./image-upload";
+import { TagInput } from "./tag-input";
 
 export type PostFormValues = {
   id?: string;
@@ -14,6 +15,7 @@ export type PostFormValues = {
   content: string;
   cover_image_url: string;
   published: boolean;
+  tags: string[];
 };
 
 function slugify(input: string) {
@@ -39,6 +41,7 @@ export function PostForm({ initial }: { initial?: PostFormValues }) {
   const [coverUrl, setCoverUrl] = useState(initial?.cover_image_url ?? "");
   const [published, setPublished] = useState(initial?.published ?? false);
   const [saving, setSaving] = useState(false);
+  const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
 
   function handleTitleChange(value: string) {
     setTitle(value);
@@ -56,6 +59,7 @@ export function PostForm({ initial }: { initial?: PostFormValues }) {
       content,
       cover_image_url: coverUrl,
       published,
+      tags,
     };
 
     try {
@@ -118,6 +122,10 @@ export function PostForm({ initial }: { initial?: PostFormValues }) {
             maxLength={300}
             className="w-full bg-surface border border-border rounded-sm px-3 py-2 text-sm text-text-primary resize-none focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent-subtle"
           />
+        </Field>
+
+        <Field label="Tags" hint="Used to filter and find related posts">
+          <TagInput value={tags} onChange={setTags} />
         </Field>
 
         <Field label="Content" hint="Markdown supported">
