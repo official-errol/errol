@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { createClient } from "@/lib/supabase/server";
 import { getProfile, getSocialLinks } from "@/lib/portfolio";
 import { resolveIcon } from "@/components/ui/icon-resolver";
 import { ContactForm } from "@/components/contact/contact-form";
@@ -15,10 +16,29 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const [profile, socials] = await Promise.all([
     getProfile(),
     getSocialLinks(),
   ]);
+
+  let defaultName = "";
+  let defaultEmail = "";
+
+  if (user) {
+    const { data: userProfile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+
+    defaultName = userProfile?.full_name ?? "";
+    defaultEmail = user.email ?? "";
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-16">
@@ -65,7 +85,14 @@ export default async function ContactPage() {
         )}
       </div>
 
-      <ContactForm />
+      {user && (
+        <p className="text-xs text-text-tertiary mb-3">
+          Signed in as {defaultName || defaultEmail}. You can still edit these
+          fields before sending.
+        </p>
+      )}
+
+      <ContactForm defaultName={defaultName} defaultEmail={defaultEmail} />
     </div>
   );
 }
