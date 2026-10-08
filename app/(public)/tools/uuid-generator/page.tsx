@@ -102,6 +102,7 @@ export default function UuidGeneratorPage() {
 
       <ToolPage
         title="UUID Generator"
+        slug="uuid-generator"
         description="Generate v4 UUIDs in bulk."
         hint={
           <>
@@ -218,10 +219,6 @@ export default function UuidGeneratorPage() {
           </>
         }
         faq={FAQ}
-        related={[
-          { slug: "json-formatter", name: "JSON Formatter" },
-          { slug: "qr-code-generator", name: "QR Code Generator" },
-        ]}
       >
         <UuidGenerator />
       </ToolPage>

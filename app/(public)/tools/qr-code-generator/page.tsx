@@ -105,6 +105,7 @@ export default function QrCodeGeneratorPage() {
 
       <ToolPage
         title="QR Code Generator"
+        slug="qr-code-generator"
         description="Turn any text or URL into a QR code."
         hint={
           <>
@@ -220,10 +221,6 @@ export default function QrCodeGeneratorPage() {
           </>
         }
         faq={FAQ}
-        related={[
-          { slug: "json-formatter", name: "JSON Formatter" },
-          { slug: "uuid-generator", name: "UUID Generator" },
-        ]}
       >
         <QrCodeGenerator />
       </ToolPage>

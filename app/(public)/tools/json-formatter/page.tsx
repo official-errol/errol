@@ -102,6 +102,7 @@ export default function JsonFormatterPage() {
 
       <ToolPage
         title="JSON Formatter"
+        slug="json-formatter"
         description="Format, validate, and minify JSON."
         hint={
           <>
@@ -215,10 +216,6 @@ export default function JsonFormatterPage() {
           </>
         }
         faq={FAQ}
-        related={[
-          { slug: "uuid-generator", name: "UUID Generator" },
-          { slug: "qr-code-generator", name: "QR Code Generator" },
-        ]}
       >
         <JsonFormatter />
       </ToolPage>

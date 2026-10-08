@@ -647,3 +647,54 @@ export function ShoppingBagIcon({ className = "w-4 h-4" }: IconProps) {
     </svg>
   );
 }
+
+export function LockIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <rect x="3" y="7" width="10" height="7" rx="1.5" {...S} />
+      <path d="M5 7V5a3 3 0 0 1 6 0v2" {...S} />
+      <circle cx="8" cy="10.5" r="0.75" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function KeyIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <circle cx="5.5" cy="10.5" r="2.5" {...S} />
+      <path d="M7.3 8.7L13 3M11.5 4.5l1.5 1.5M10 6l1 1" {...S} />
+    </svg>
+  );
+}
+
+export function ShieldCheckIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <path d="M8 1.5l5 2v4c0 3-2 5.5-5 7-3-1.5-5-4-5-7v-4l5-2Z" {...S} />
+      <path d="M5.5 8l2 2 3-3.5" {...S} />
+    </svg>
+  );
+}
+
+export function ClockIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="6.5" {...S} />
+      <path d="M8 4.5V8l2.5 1.5" {...S} />
+    </svg>
+  );
+}
+
+export function PaletteIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 1.5a6.5 6.5 0 0 0 0 13c.9 0 1.5-.7 1.5-1.5 0-.5-.2-.8-.5-1.1-.3-.3-.5-.7-.5-1.1 0-.8.7-1.5 1.5-1.5h1.4c1.5 0 2.6-1.2 2.6-2.6C14 4 11.3 1.5 8 1.5Z"
+        {...S}
+      />
+      <circle cx="5" cy="7" r="0.75" fill="currentColor" />
+      <circle cx="7.5" cy="4.5" r="0.75" fill="currentColor" />
+      <circle cx="10.5" cy="5" r="0.75" fill="currentColor" />
+    </svg>
+  );
+}
