@@ -628,3 +628,22 @@ export function SearchIcon({ className = "w-4 h-4" }: IconProps) {
     </svg>
   );
 }
+
+export function ShoppingBagIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <path
+        d="M3 5h10l-1 8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1L3 5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6 5V4a2 2 0 0 1 4 0v1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}

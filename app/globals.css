@@ -109,3 +109,28 @@ body {
   display: block;
   padding-right: 3rem; /* leave room for the copy button */
 }
+
+@keyframes marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Accessibility: disable all marquee animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  [style*="marquee-"] {
+    animation: none !important;
+  }
+}

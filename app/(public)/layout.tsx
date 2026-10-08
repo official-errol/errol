@@ -75,6 +75,9 @@ export default async function PublicLayout({
             <Link href="/shop" className="hover:text-text-primary">
               Shop
             </Link>
+            <Link href="/tools" className="hover:text-text-primary">
+              Tools
+            </Link>
             <Link href="/files" className="hover:text-text-primary">
               Files
             </Link>

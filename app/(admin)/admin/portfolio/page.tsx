@@ -39,6 +39,7 @@ export default async function PortfolioOverviewPage() {
       description: "Name, headline, bio, availability",
       icon: UserIcon,
       count: profileRes.data ? "1 item" : "Empty",
+      color: "text-accent",
     },
     {
       href: "/admin/portfolio/experience",
@@ -46,6 +47,7 @@ export default async function PortfolioOverviewPage() {
       description: "Work history and roles",
       icon: BriefcaseIcon,
       count: `${expCount.count ?? 0} entries`,
+      color: "text-violet-500",
     },
     {
       href: "/admin/portfolio/education",
@@ -53,6 +55,7 @@ export default async function PortfolioOverviewPage() {
       description: "Schools, degrees, certifications",
       icon: GraduationIcon,
       count: `${eduCount.count ?? 0} entries`,
+      color: "text-emerald-500",
     },
     {
       href: "/admin/portfolio/certifications",
@@ -60,6 +63,7 @@ export default async function PortfolioOverviewPage() {
       description: "Courses, exams, licenses",
       icon: CertificateIcon,
       count: `${certCount.count ?? 0} certifications`,
+      color: "text-amber-500",
     },
     {
       href: "/admin/portfolio/awards",
@@ -67,6 +71,7 @@ export default async function PortfolioOverviewPage() {
       description: "Recognition and honors",
       icon: TrophyIcon,
       count: `${awardCount.count ?? 0} awards`,
+      color: "text-yellow-500",
     },
     {
       href: "/admin/portfolio/skills",
@@ -74,6 +79,7 @@ export default async function PortfolioOverviewPage() {
       description: "Categories and skill tags",
       icon: CodeIcon,
       count: `${skillCount.count ?? 0} skills`,
+      color: "text-cyan-500",
     },
     {
       href: "/admin/portfolio/social",
@@ -81,6 +87,7 @@ export default async function PortfolioOverviewPage() {
       description: "External links in hero and footer",
       icon: LinkIcon,
       count: `${socialCount.count ?? 0} links`,
+      color: "text-pink-500",
     },
   ];
 
@@ -102,11 +109,11 @@ export default async function PortfolioOverviewPage() {
             <Link
               key={s.href}
               href={s.href}
-              className="bg-surface border border-border rounded-lg p-5 hover:border-border-strong transition-colors group"
+              className="bg-surface border border-border rounded-lg p-5 hover:border-border-strong transition-colors"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="p-2 rounded-md bg-surface-subtle">
-                  <Icon className="w-4 h-4 text-text-secondary" />
+                  <Icon className={`w-4 h-4 ${s.color}`} />
                 </div>
                 <span className="text-xs text-text-tertiary">{s.count}</span>
               </div>
