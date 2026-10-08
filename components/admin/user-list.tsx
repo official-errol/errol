@@ -6,7 +6,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
-import { ShieldIcon } from "@/components/ui/icons";
+import { ShieldIcon, CalendarIcon } from "@/components/ui/icons";
 
 type User = {
   id: string;
@@ -16,6 +16,14 @@ type User = {
   role: string;
   created_at: string;
 };
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 export function UserList({
   users,
@@ -72,7 +80,8 @@ export function UserList({
 
   return (
     <>
-      <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      {/* Desktop table */}
+      <div className="hidden md:block bg-surface border border-border rounded-lg overflow-hidden">
         <table className="w-full">
           <thead className="bg-surface-subtle">
             <tr className="text-left text-xs uppercase tracking-wide text-text-secondary">
@@ -127,7 +136,7 @@ export function UserList({
                     )}
                   </td>
                   <td className="px-4 py-3 text-sm text-text-secondary">
-                    {new Date(user.created_at).toLocaleDateString()}
+                    {formatDate(user.created_at)}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1.5">
@@ -153,6 +162,82 @@ export function UserList({
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {users.map((user) => {
+          const isSelf = user.id === currentUserId;
+          const nextRole = user.role === "admin" ? "user" : "admin";
+
+          return (
+            <div
+              key={user.id}
+              className="bg-surface border border-border rounded-lg p-4"
+            >
+              <div className="flex items-start gap-3 mb-3">
+                {user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt=""
+                    className="w-10 h-10 rounded-full border border-border shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-surface-subtle shrink-0" />
+                )}
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium text-text-primary truncate">
+                      {user.full_name ?? "Anonymous"}
+                    </p>
+                    {isSelf && (
+                      <span className="text-xs text-text-tertiary">(you)</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-text-tertiary truncate mt-0.5">
+                    {user.email}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    {user.role === "admin" ? (
+                      <span className="text-xs px-2 py-0.5 bg-accent-subtle text-accent rounded-sm">
+                        Admin
+                      </span>
+                    ) : (
+                      <span className="text-xs px-2 py-0.5 bg-surface-subtle text-text-secondary rounded-sm">
+                        User
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1 text-xs text-text-tertiary">
+                      <CalendarIcon className="w-3.5 h-3.5" />
+                      {formatDate(user.created_at)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {!isSelf && (
+                <div className="flex items-center gap-2 pt-3 border-t border-border">
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    onClick={() =>
+                      setTarget({
+                        user,
+                        newRole: nextRole as "user" | "admin",
+                      })
+                    }
+                  >
+                    <ShieldIcon />
+                    {user.role === "admin"
+                      ? "Demote to user"
+                      : "Promote to admin"}
+                  </Button>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <ConfirmDialog
