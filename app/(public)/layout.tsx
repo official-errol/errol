@@ -66,23 +66,11 @@ export default async function PublicLayout({
         <div className="max-w-5xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-text-secondary">
           <p>© {new Date().getFullYear()} Errol</p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
-            <Link href="/projects" className="hover:text-text-primary">
-              Projects
-            </Link>
-            <Link href="/blog" className="hover:text-text-primary">
-              Blog
-            </Link>
             <Link href="/shop" className="hover:text-text-primary">
               Shop
             </Link>
             <Link href="/tools" className="hover:text-text-primary">
               Tools
-            </Link>
-            <Link href="/files" className="hover:text-text-primary">
-              Files
-            </Link>
-            <Link href="/contact" className="hover:text-text-primary">
-              Contact
             </Link>
             <Link href="/privacy" className="hover:text-text-primary">
               Privacy

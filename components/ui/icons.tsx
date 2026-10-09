@@ -698,3 +698,46 @@ export function PaletteIcon({ className = "w-4 h-4" }: IconProps) {
     </svg>
   );
 }
+
+export function SendIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <path d="M14 8L2 3l2.5 5L2 13l12-5z" {...S} />
+    </svg>
+  );
+}
+
+export function SquareIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <rect x="4" y="4" width="8" height="8" rx="1" {...S} />
+    </svg>
+  );
+}
+
+export function SparklesIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 1.5l1.3 3.7L13 6.5l-3.7 1.3L8 11.5 6.7 7.8 3 6.5l3.7-1.3L8 1.5z"
+        {...S}
+      />
+      <path
+        d="M12.5 11l.6 1.7 1.9.8-1.9.8-.6 1.7-.6-1.7-1.9-.8 1.9-.8.6-1.7z"
+        {...S}
+      />
+    </svg>
+  );
+}
+
+export function SettingsIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="2" {...S} />
+      <path
+        d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"
+        {...S}
+      />
+    </svg>
+  );
+}

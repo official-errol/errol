@@ -28,6 +28,7 @@ import { PostCard } from "@/components/blog/post-card";
 import { SectionPattern } from "@/components/ui/section-pattern";
 import { Metadata } from "next";
 import { getReadingTime } from "@/lib/reading-time";
+import { PixelCharacter } from "@/components/character/pixel-character";
 
 function formatRange(
   start: string | null,
@@ -156,6 +157,7 @@ export default async function PortfolioPage() {
 
   return (
     <>
+      <PixelCharacter />
       {/* ───────────────────────────────── HERO — dots */}
       <SectionPattern pattern="dots">
         <section className="py-20 md:py-28">
