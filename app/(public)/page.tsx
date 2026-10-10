@@ -52,7 +52,7 @@ function SectionHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-end justify-between mb-10">
+    <div className="flex items-end justify-between mb-10" data-character-ignore>
       <h2 className="flex items-center gap-2.5 text-2xl md:text-3xl font-semibold text-text-primary">
         <Icon className="w-5 h-5 text-text-secondary" />
         {title}
@@ -204,6 +204,7 @@ export default async function PortfolioPage() {
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href="/contact"
+                    data-character-target
                     className="px-5 py-2.5 bg-primary text-text-inverse rounded-md text-sm hover:bg-text-primary/85 transition-colors"
                   >
                     Get in touch
@@ -213,6 +214,7 @@ export default async function PortfolioPage() {
                       href={profile.resume_url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      data-character-target
                       className="inline-flex items-center gap-2 px-5 py-2.5 border border-border text-text-primary rounded-md text-sm hover:bg-surface-subtle transition-colors"
                     >
                       <DownloadIcon /> Resume
@@ -231,6 +233,7 @@ export default async function PortfolioPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           title={s.label}
+                          data-character-target
                           className="p-2 rounded-md border border-border bg-surface text-text-secondary hover:text-text-primary hover:border-border-strong transition-colors"
                         >
                           <Icon className="w-4 h-4" />
@@ -246,6 +249,7 @@ export default async function PortfolioPage() {
                   <img
                     src={profile.avatar_url}
                     alt={profile.name}
+                    data-character-target
                     className="w-32 h-32 md:w-56 md:h-56 rounded-full border border-border object-cover"
                   />
                 </div>
@@ -277,10 +281,20 @@ export default async function PortfolioPage() {
 
               <div className="space-y-10">
                 {experiences.map((exp, i) => (
-                  <div key={exp.id} className="relative pl-8">
-                    <div className="absolute left-0 top-[7px] w-2.5 h-2.5 rounded-full border-2 border-accent bg-background" />
+                  <div
+                    key={exp.id}
+                    className="relative pl-8"
+                    data-character-target
+                  >
+                    <div
+                      className="absolute left-0 top-[7px] w-2.5 h-2.5 rounded-full border-2 border-accent bg-background"
+                      data-character-ignore
+                    />
                     {i < experiences.length - 1 && (
-                      <div className="absolute left-[4px] top-[26px] bottom-[-2.5rem] w-px bg-border" />
+                      <div
+                        className="absolute left-[4px] top-[26px] bottom-[-2.5rem] w-px bg-border"
+                        data-character-ignore
+                      />
                     )}
 
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-1">
@@ -337,10 +351,20 @@ export default async function PortfolioPage() {
 
             <div className="space-y-10">
               {education.map((ed, i) => (
-                <div key={ed.id} className="relative pl-8">
-                  <div className="absolute left-0 top-[7px] w-2.5 h-2.5 rounded-full border-2 border-accent bg-background" />
+                <div
+                  key={ed.id}
+                  className="relative pl-8"
+                  data-character-target
+                >
+                  <div
+                    className="absolute left-0 top-[7px] w-2.5 h-2.5 rounded-full border-2 border-accent bg-background"
+                    data-character-ignore
+                  />
                   {i < education.length - 1 && (
-                    <div className="absolute left-[4px] top-[26px] bottom-[-2.5rem] w-px bg-border" />
+                    <div
+                      className="absolute left-[4px] top-[26px] bottom-[-2.5rem] w-px bg-border"
+                      data-character-ignore
+                    />
                   )}
 
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-1">
@@ -402,17 +426,23 @@ export default async function PortfolioPage() {
                 {certifications.map((cert, i) => {
                   const hasImage = Boolean(cert.image_url);
                   return (
-                    <div key={cert.id} className="relative pl-8">
+                    <div
+                      key={cert.id}
+                      className="relative pl-8"
+                      data-character-target
+                    >
                       <div
                         className={`absolute left-0 w-2.5 h-2.5 -mt-1 rounded-full border-2 border-accent bg-background ${
                           hasImage ? "top-[1.75rem]" : "top-[0.625rem]"
                         }`}
+                        data-character-ignore
                       />
                       {i < certifications.length - 1 && (
                         <div
                           className={`absolute left-[4px] bottom-[-2.5rem] w-px bg-border ${
                             hasImage ? "top-[2rem]" : "top-[0.875rem]"
                           }`}
+                          data-character-ignore
                         />
                       )}
 
@@ -483,17 +513,23 @@ export default async function PortfolioPage() {
               {awards.map((award, i) => {
                 const hasImage = Boolean(award.image_url);
                 return (
-                  <div key={award.id} className="relative pl-8">
+                  <div
+                    key={award.id}
+                    className="relative pl-8"
+                    data-character-target
+                  >
                     <div
                       className={`absolute left-0 w-2.5 h-2.5 -mt-1 rounded-full border-2 border-accent bg-background ${
                         hasImage ? "top-[1.75rem]" : "top-[0.625rem]"
                       }`}
+                      data-character-ignore
                     />
                     {i < awards.length - 1 && (
                       <div
                         className={`absolute left-[4px] bottom-[-2.5rem] w-px bg-border ${
                           hasImage ? "top-[2rem]" : "top-[0.875rem]"
                         }`}
+                        data-character-ignore
                       />
                     )}
 
@@ -579,6 +615,7 @@ export default async function PortfolioPage() {
                             <span
                               key={skill.id}
                               className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-surface border border-border rounded-md text-text-primary font-mono"
+                              data-character-target
                             >
                               {Icon && (
                                 <Icon className="w-3.5 h-3.5 text-text-secondary shrink-0" />
@@ -616,19 +653,20 @@ export default async function PortfolioPage() {
 
             <div className="grid gap-6 md:grid-cols-3">
               {featuredProjects.data.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  project={{
-                    id: project.id,
-                    slug: project.slug,
-                    title: project.title,
-                    summary: project.summary,
-                    cover_image_url: project.cover_image_url,
-                    tech_stack: project.tech_stack ?? [],
-                    featured: true,
-                    live_url: project.live_url,
-                  }}
-                />
+                <div key={project.id} data-character-target>
+                  <ProjectCard
+                    project={{
+                      id: project.id,
+                      slug: project.slug,
+                      title: project.title,
+                      summary: project.summary,
+                      cover_image_url: project.cover_image_url,
+                      tech_stack: project.tech_stack ?? [],
+                      featured: true,
+                      live_url: project.live_url,
+                    }}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -655,21 +693,22 @@ export default async function PortfolioPage() {
 
               <div className="grid gap-6 md:grid-cols-3">
                 {latestPosts.data.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={{
-                      id: post.id,
-                      slug: post.slug,
-                      title: post.title,
-                      excerpt: post.excerpt,
-                      cover_image_url: post.cover_image_url,
-                      published_at: post.published_at,
-                      reading_minutes: getReadingTime(post.content),
-                      comment_count: latestCommentCounts[post.id] ?? 0,
-                      reactions: latestReactionCounts[post.id],
-                      tags: post.tags ?? [],
-                    }}
-                  />
+                  <div key={post.id} data-character-target>
+                    <PostCard
+                      post={{
+                        id: post.id,
+                        slug: post.slug,
+                        title: post.title,
+                        excerpt: post.excerpt,
+                        cover_image_url: post.cover_image_url,
+                        published_at: post.published_at,
+                        reading_minutes: getReadingTime(post.content),
+                        comment_count: latestCommentCounts[post.id] ?? 0,
+                        reactions: latestReactionCounts[post.id],
+                        tags: post.tags ?? [],
+                      }}
+                    />
+                  </div>
                 ))}
               </div>
             </div>

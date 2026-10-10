@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SPRITE_CONFIG, type AnimationName } from "@/lib/sprite-config";
+import { getInteractiveElements } from "@/lib/character-targets";
 
 const { frameWidth, frameHeight, scale, path, animations } = SPRITE_CONFIG;
 const DISPLAY_W = frameWidth * scale;
@@ -10,15 +11,19 @@ const SHEET_SCALED_W = SPRITE_CONFIG.sheetWidth * scale;
 const SHEET_SCALED_H = SPRITE_CONFIG.sheetHeight * scale;
 
 // Movement
-const WALK_SPEED = 22;
-const RUN_SPEED = 42;
-const ARRIVE_DISTANCE = 4;
+const WALK_SPEED = 30;
+const RUN_SPEED = 55;
+const ARRIVE_DISTANCE = 5;
+// Looser arrival radius for elements since the target position shifts as the user scrolls
+const ARRIVE_DISTANCE_ELEMENT = 20;
 
 // Pauses (ms)
 const PAUSE_MIN = 1200;
 const PAUSE_MAX = 3000;
 const SIT_PAUSE_MIN = 3500;
 const SIT_PAUSE_MAX = 7000;
+const PEEK_DURATION_MIN = 4000;
+const PEEK_DURATION_MAX = 8000;
 
 // Idle animations
 const IDLE_ANIMS: AnimationName[] = ["idle", "idle", "idle", "sit"];
@@ -29,7 +34,7 @@ const HOVER_ANIMS: AnimationName[] = ["kick", "attack", "damage"];
 // Click celebrate
 const CELEBRATE_ANIMS: AnimationName[] = ["jump", "win"];
 
-// Draggable feels — what to play while held and after drop
+// Drag
 const GRAB_ANIM: AnimationName = "pull";
 const DROP_ANIM: AnimationName = "damage";
 
@@ -38,13 +43,22 @@ const MARGIN_X = 24;
 const MARGIN_TOP = 96;
 const MARGIN_BOTTOM = 24;
 
+// Element interaction
+const ELEMENT_PICK_WEIGHT = 0.5;
+const PEEK_OVERLAP_RATIO = 0.6;
+const EXCLUDE_SELECTOR = "[data-character-ignore]";
+
 type Point = { x: number; y: number };
+
+type Target =
+  | { kind: "point"; x: number; y: number }
+  | { kind: "element"; element: HTMLElement };
 
 export function PixelCharacter() {
   const [mounted, setMounted] = useState(false);
 
   const posRef = useRef<Point>({ x: 0, y: 0 });
-  const targetRef = useRef<Point>({ x: 0, y: 0 });
+  const targetRef = useRef<Target>({ kind: "point", x: 0, y: 0 });
   const [renderPos, setRenderPos] = useState<Point>({ x: 0, y: 0 });
 
   const [animation, setAnimation] = useState<AnimationName>("idle");
@@ -63,10 +77,16 @@ export function PixelCharacter() {
 
   const lastHoverRef = useRef<number>(0);
 
-  // Drag state
+  // Drag
   const draggingRef = useRef(false);
   const dragOffsetRef = useRef<Point>({ x: 0, y: 0 });
   const dragMovedRef = useRef(false);
+
+  // Peek sequence
+  const peekingRef = useRef(false);
+  const peekUntilRef = useRef<number>(0);
+  const peekingElementRef = useRef<HTMLElement | null>(null);
+  const arrivedRef = useRef(false);
 
   const boundsRef = useRef({
     minX: MARGIN_X,
@@ -102,20 +122,40 @@ export function PixelCharacter() {
     };
   };
 
-  const pickNewTarget = useCallback(() => {
+  const pickRandomPoint = useCallback((): Point => {
     const { minX, maxX, minY, maxY } = boundsRef.current;
     let x = minX + Math.random() * (maxX - minX);
     let y = minY + Math.random() * (maxY - minY);
-
     const dx = x - posRef.current.x;
     const dy = y - posRef.current.y;
     if (Math.hypot(dx, dy) < 80) {
       x = minX + Math.random() * (maxX - minX);
       y = minY + Math.random() * (maxY - minY);
     }
-
-    targetRef.current = { x, y };
+    return { x, y };
   }, []);
+
+  const pickNewTarget = useCallback(() => {
+    arrivedRef.current = false;
+
+    if (Math.random() < ELEMENT_PICK_WEIGHT) {
+      const elements = getInteractiveElements({
+        minWidth: 20,
+        minHeight: 20,
+        marginTop: MARGIN_TOP,
+        marginBottom: MARGIN_BOTTOM,
+        marginX: MARGIN_X,
+        excludeSelector: EXCLUDE_SELECTOR,
+      });
+      if (elements.length > 0) {
+        const el = elements[Math.floor(Math.random() * elements.length)];
+        targetRef.current = { kind: "element", element: el };
+        return;
+      }
+    }
+    const p = pickRandomPoint();
+    targetRef.current = { kind: "point", x: p.x, y: p.y };
+  }, [pickRandomPoint]);
 
   const pickIdleBehavior = useCallback((): {
     anim: AnimationName;
@@ -162,6 +202,7 @@ export function PixelCharacter() {
 
   const handleHover = useCallback(() => {
     if (draggingRef.current) return;
+    if (peekingRef.current) return;
     const now = performance.now();
     if (now - lastHoverRef.current < 1500) return;
     if (playingOneShotRef.current) return;
@@ -174,7 +215,6 @@ export function PixelCharacter() {
   }, [playOneShot]);
 
   const handleClick = useCallback(() => {
-    // If we just finished a drag, don't also trigger the click action
     if (dragMovedRef.current) {
       dragMovedRef.current = false;
       return;
@@ -187,13 +227,14 @@ export function PixelCharacter() {
     playOneShot(pick, wasMoving);
   }, [playOneShot]);
 
-  // ─── Drag handlers ──────────────────────────────────────
+  // ─── Drag ──────────────────────────────────────────────
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
-      // Left-click / touch only
       if (e.button !== 0) return;
       draggingRef.current = true;
       dragMovedRef.current = false;
+      peekingRef.current = false;
+      arrivedRef.current = false;
 
       const rect = e.currentTarget.getBoundingClientRect();
       dragOffsetRef.current = {
@@ -201,10 +242,8 @@ export function PixelCharacter() {
         y: e.clientY - rect.top,
       };
 
-      // Capture pointer so we keep receiving events even outside the button
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      // Cancel any in-progress one-shot and lock into grab animation
       playingOneShotRef.current = false;
       pauseUntilRef.current = 0;
       setAnimation(GRAB_ANIM);
@@ -223,7 +262,6 @@ export function PixelCharacter() {
         y: e.clientY - dragOffsetRef.current.y,
       });
 
-      // Mark as moved only after a real displacement
       const dx = next.x - posRef.current.x;
       const dy = next.y - posRef.current.y;
       if (Math.hypot(dx, dy) > 3) dragMovedRef.current = true;
@@ -242,26 +280,14 @@ export function PixelCharacter() {
       try {
         e.currentTarget.releasePointerCapture(e.pointerId);
       } catch {
-        // ignore — pointer capture might already be released
+        // ignore
       }
 
-      // Drop animation, then resume wandering
       playingOneShotRef.current = false;
       playOneShot(DROP_ANIM, false);
-
-      // Pick a fresh target far from current position
-      const { minX, maxX, minY, maxY } = boundsRef.current;
-      let x = minX + Math.random() * (maxX - minX);
-      let y = minY + Math.random() * (maxY - minY);
-      const dx = x - posRef.current.x;
-      const dy = y - posRef.current.y;
-      if (Math.hypot(dx, dy) < 120) {
-        x = minX + Math.random() * (maxX - minX);
-        y = minY + Math.random() * (maxY - minY);
-      }
-      targetRef.current = { x, y };
+      pickNewTarget();
     },
-    [playOneShot],
+    [playOneShot, pickNewTarget],
   );
 
   // ─── Main loop ──────────────────────────────────────────
@@ -287,6 +313,7 @@ export function PixelCharacter() {
 
       const anim = animations[animationRef.current];
 
+      // Advance the frame
       frameTimerRef.current += dt;
       const frameDuration = 1 / anim.fps;
       if (frameTimerRef.current >= frameDuration) {
@@ -298,27 +325,122 @@ export function PixelCharacter() {
         setFrame(frameRef.current);
       }
 
-      // No movement while dragging
       if (draggingRef.current) {
         raf = requestAnimationFrame(tick);
         return;
       }
 
+      // ── Peek sequence ─────────────────────────────────
+      if (peekingRef.current) {
+        const el = peekingElementRef.current;
+        if (!el || !el.isConnected) {
+          peekingRef.current = false;
+          peekingElementRef.current = null;
+          arrivedRef.current = false;
+          pickNewTarget();
+        } else {
+          const rect = el.getBoundingClientRect();
+
+          if (
+            rect.bottom < MARGIN_TOP ||
+            rect.top > window.innerHeight - MARGIN_BOTTOM
+          ) {
+            peekingRef.current = false;
+            peekingElementRef.current = null;
+            arrivedRef.current = false;
+            pickNewTarget();
+          } else {
+            // Snap to element position — this is what makes scroll tracking work
+            const targetX = rect.left + rect.width / 2 - DISPLAY_W / 2;
+            const targetY = rect.top - DISPLAY_H * (1 - PEEK_OVERLAP_RATIO);
+            const locked = clamp({ x: targetX, y: targetY });
+
+            posRef.current = locked;
+            setRenderPos(locked);
+
+            // End peek when the timer expires
+            if (now >= peekUntilRef.current) {
+              peekingRef.current = false;
+              peekingElementRef.current = null;
+              arrivedRef.current = false;
+              playOneShot("jump", false);
+              pickNewTarget();
+            }
+          }
+        }
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+
+      // ── Movement ─────────────────────────────────────
       const paused = now < pauseUntilRef.current;
       const canMove = !paused && !playingOneShotRef.current && anim.loop;
 
       if (canMove) {
-        const dx = targetRef.current.x - posRef.current.x;
-        const dy = targetRef.current.y - posRef.current.y;
+        let targetX: number;
+        let targetY: number;
+        let isElement = false;
+
+        if (targetRef.current.kind === "element") {
+          const el = targetRef.current.element;
+          if (!el.isConnected) {
+            pickNewTarget();
+            raf = requestAnimationFrame(tick);
+            return;
+          }
+          const rect = el.getBoundingClientRect();
+
+          if (
+            rect.bottom < MARGIN_TOP ||
+            rect.top > window.innerHeight - MARGIN_BOTTOM ||
+            rect.right < 0 ||
+            rect.left > window.innerWidth
+          ) {
+            pickNewTarget();
+            raf = requestAnimationFrame(tick);
+            return;
+          }
+
+          targetX = rect.left + rect.width / 2 - DISPLAY_W / 2;
+          targetY = rect.top - DISPLAY_H * (1 - PEEK_OVERLAP_RATIO);
+          isElement = true;
+        } else {
+          targetX = targetRef.current.x;
+          targetY = targetRef.current.y;
+        }
+
+        const dx = targetX - posRef.current.x;
+        const dy = targetY - posRef.current.y;
         const dist = Math.hypot(dx, dy);
 
-        if (dist < ARRIVE_DISTANCE) {
-          const { anim: idleAnim, duration } = pickIdleBehavior();
-          pauseUntilRef.current = now + duration;
-          setAnimation(idleAnim);
-          frameRef.current = 0;
-          frameTimerRef.current = 0;
-          pickNewTarget();
+        const arriveThreshold = isElement
+          ? ARRIVE_DISTANCE_ELEMENT
+          : ARRIVE_DISTANCE;
+
+        if (dist < arriveThreshold) {
+          if (isElement && targetRef.current.kind === "element") {
+            if (!arrivedRef.current) {
+              arrivedRef.current = true;
+              const el = targetRef.current.element;
+
+              // Enter peek state IMMEDIATELY — no setTimeout delay
+              peekingRef.current = true;
+              peekingElementRef.current = el;
+              peekUntilRef.current =
+                performance.now() +
+                PEEK_DURATION_MIN +
+                Math.random() * (PEEK_DURATION_MAX - PEEK_DURATION_MIN);
+
+              playOneShot("jump", false);
+            }
+          } else {
+            const { anim: idleAnim, duration } = pickIdleBehavior();
+            pauseUntilRef.current = now + duration;
+            setAnimation(idleAnim);
+            frameRef.current = 0;
+            frameTimerRef.current = 0;
+            pickNewTarget();
+          }
         } else {
           const useRun = dist > 350;
           const speed = useRun ? RUN_SPEED : WALK_SPEED;
@@ -348,7 +470,7 @@ export function PixelCharacter() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", updateBounds);
     };
-  }, [pickIdleBehavior, pickNewTarget, updateBounds]);
+  }, [pickIdleBehavior, pickNewTarget, playOneShot, updateBounds]);
 
   if (!mounted) return null;
 
