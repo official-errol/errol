@@ -117,8 +117,39 @@ body {
   image-rendering: crisp-edges;
 }
 
-/* Fix for nested prose inside custom components */
-.prose [data-custom="callout"],
-.prose [data-custom="steps"] {
-  @apply not-prose;
+/* ========================
+   MDX Custom Components
+   ======================== */
+
+/* Reset prose styling inside custom MDX components */
+.prose [data-mdx-steps],
+.prose [data-mdx-steps] *,
+.prose [data-mdx-callout],
+.prose [data-mdx-callout] *,
+.prose [data-mdx-elicitations],
+.prose [data-mdx-elicitations] * {
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Restore paragraph spacing inside callout body */
+.prose [data-mdx-callout] p {
+  margin: 0.5rem 0;
+}
+
+.prose [data-mdx-callout] > div > div > *:first-child {
+  margin-top: 0;
+}
+
+.prose [data-mdx-callout] > div > div > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Restore paragraph spacing inside steps */
+.prose [data-mdx-steps] p {
+  margin: 0.25rem 0;
 }

@@ -2,7 +2,10 @@ import type { ReactNode } from 'react'
 
 export function Steps({ children }: { children: ReactNode }) {
   return (
-    <div className="not-prose my-8 space-y-3 border-l-2 border-border pl-5">
+    <div
+      data-mdx-steps
+      className="my-8 space-y-3 border-l-2 border-border pl-5"
+    >
       {children}
     </div>
   )
@@ -19,7 +22,6 @@ export function Step({
 }) {
   return (
     <div className="relative">
-      {/* Dot on the left border */}
       <div className="absolute -left-[27px] top-1.5 w-3 h-3 rounded-full border-2 border-accent bg-background" />
 
       <div className="flex items-baseline gap-2 flex-wrap mb-1">

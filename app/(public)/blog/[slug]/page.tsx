@@ -1,42 +1,42 @@
-import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { CommentList, type Comment } from "@/components/blog/comment-list";
-import { CommentForm } from "@/components/blog/comment-form";
-import { ReactionButtons } from "@/components/blog/reaction-buttons";
-import { ShareButtons } from "@/components/blog/share-buttons";
+import { notFound } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { CommentList, type Comment } from '@/components/blog/comment-list'
+import { CommentForm } from '@/components/blog/comment-form'
+import { ReactionButtons } from '@/components/blog/reaction-buttons'
+import { ShareButtons } from '@/components/blog/share-buttons'
 import {
   TableOfContentsDesktop,
   TableOfContentsMobile,
-} from "@/components/blog/table-of-contents";
-import { CodeBlockEnhancer } from "@/components/blog/copy-code-button";
-import { RelatedPosts } from "@/components/blog/related-posts";
-import { TagChips } from "@/components/blog/tag-chips";
-import { PublicPageHeader } from "@/components/ui/public-page-header";
-import { SignInPrompt } from "@/components/auth/sign-in-prompt";
-import { getReadingTime, formatReadingTime } from "@/lib/reading-time";
-import { extractToc } from "@/lib/toc";
-import { getRelatedPosts } from "@/lib/related-posts";
+} from '@/components/blog/table-of-contents'
+import { CodeBlockEnhancer } from '@/components/blog/copy-code-button'
+import { RelatedPosts } from '@/components/blog/related-posts'
+import { TagChips } from '@/components/blog/tag-chips'
+import { PublicPageHeader } from '@/components/ui/public-page-header'
+import { SignInPrompt } from '@/components/auth/sign-in-prompt'
 import { MarkdownRenderer } from '@/components/blog/markdown-renderer'
+import { getReadingTime, formatReadingTime } from '@/lib/reading-time'
+import { extractToc } from '@/lib/toc'
+import { getRelatedPosts } from '@/lib/related-posts'
 
-const BASE_URL = "https://errolsolomon.vercel.app";
+const BASE_URL = 'https://errolsolomon.vercel.app'
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>
 }) {
-  const { slug } = await params;
-  const supabase = await createClient();
+  const { slug } = await params
+  const supabase = await createClient()
   const { data: post } = await supabase
-    .from("posts")
-    .select("title, excerpt, cover_image_url, published_at")
-    .eq("slug", slug)
-    .eq("published", true)
-    .single();
+    .from('posts')
+    .select('title, excerpt, cover_image_url, published_at')
+    .eq('slug', slug)
+    .eq('published', true)
+    .single()
 
-  if (!post) return { title: "Post not found" };
+  if (!post) return { title: 'Post not found' }
 
-  const image = post.cover_image_url || "/opengraph-image";
+  const image = post.cover_image_url || '/opengraph-image'
 
   return {
     title: post.title,
@@ -45,45 +45,45 @@ export async function generateMetadata({
     openGraph: {
       title: post.title,
       description: post.excerpt ?? undefined,
-      type: "article",
+      type: 'article',
       url: `${BASE_URL}/blog/${slug}`,
       images: [{ url: image, width: 1200, height: 630, alt: post.title }],
       publishedTime: post.published_at ?? undefined,
     },
     twitter: {
-      card: "summary_large_image",
+      card: 'summary_large_image',
       title: post.title,
       description: post.excerpt ?? undefined,
       images: [image],
     },
-  };
+  }
 }
 
 export default async function PostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>
 }) {
-  const { slug } = await params;
-  const supabase = await createClient();
+  const { slug } = await params
+  const supabase = await createClient()
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser()
 
   const { data: post } = await supabase
-    .from("posts")
+    .from('posts')
     .select(
-      "id, slug, title, excerpt, content, cover_image_url, published_at, author_id, tags",
+      'id, slug, title, excerpt, content, cover_image_url, published_at, author_id, tags'
     )
-    .eq("slug", slug)
-    .eq("published", true)
-    .single();
+    .eq('slug', slug)
+    .eq('published', true)
+    .single()
 
-  if (!post) notFound();
+  if (!post) notFound()
 
   const { data: commentsRaw } = await supabase
-    .from("comments")
+    .from('comments')
     .select(
       `
       id,
@@ -92,17 +92,17 @@ export default async function PostPage({
       created_at,
       author_id,
       profiles:author_id (full_name, avatar_url)
-    `,
+    `
     )
-    .eq("post_id", post.id)
-    .order("created_at", { ascending: true });
+    .eq('post_id', post.id)
+    .order('created_at', { ascending: true })
 
   const comments: Comment[] = (commentsRaw ?? []).map((c) => {
     const raw = c.profiles as
       | { full_name: string | null; avatar_url: string | null }
       | { full_name: string | null; avatar_url: string | null }[]
-      | null;
-    const profile = Array.isArray(raw) ? (raw[0] ?? null) : raw;
+      | null
+    const profile = Array.isArray(raw) ? raw[0] ?? null : raw
     return {
       id: c.id,
       content: c.content,
@@ -110,32 +110,32 @@ export default async function PostPage({
       created_at: c.created_at,
       author_id: c.author_id,
       profiles: profile,
-    };
-  });
+    }
+  })
 
   const { data: reactions } = await supabase
-    .from("reactions")
-    .select("kind, user_id")
-    .eq("post_id", post.id);
+    .from('reactions')
+    .select('kind, user_id')
+    .eq('post_id', post.id)
 
-  const relatedPosts = await getRelatedPosts(post.id, post.tags ?? [], 3);
+  const relatedPosts = await getRelatedPosts(post.id, post.tags ?? [], 3)
 
-  const postUrl = `${BASE_URL}/blog/${post.slug}`;
-  const readingMinutes = getReadingTime(post.content);
-  const toc = extractToc(post.content);
+  const postUrl = `${BASE_URL}/blog/${post.slug}`
+  const readingMinutes = getReadingTime(post.content)
+  const toc = extractToc(post.content)
 
   const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
     headline: post.title,
     description: post.excerpt ?? undefined,
     datePublished: post.published_at,
     dateModified: post.published_at,
     image: post.cover_image_url ?? undefined,
-    author: { "@type": "Organization", name: "Errol", url: BASE_URL },
-    publisher: { "@type": "Organization", name: "Errol", url: BASE_URL },
-    mainEntityOfPage: { "@type": "WebPage", "@id": postUrl },
-  };
+    author: { '@type': 'Organization', name: 'Errol', url: BASE_URL },
+    publisher: { '@type': 'Organization', name: 'Errol', url: BASE_URL },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
+  }
 
   return (
     <>
@@ -149,16 +149,16 @@ export default async function PostPage({
           <article className="max-w-3xl mx-auto lg:mx-0 lg:max-w-none">
             <PublicPageHeader
               breadcrumbs={[
-                { label: "Portfolio", href: "/" },
-                { label: "Blog", href: "/blog" },
+                { label: 'Portfolio', href: '/' },
+                { label: 'Blog', href: '/blog' },
                 { label: post.title },
               ]}
               title={post.title}
               description={
                 post.published_at
                   ? `Published ${new Date(post.published_at).toLocaleDateString(
-                      "en-US",
-                      { year: "numeric", month: "long", day: "numeric" },
+                      'en-US',
+                      { year: 'numeric', month: 'long', day: 'numeric' }
                     )} · ${formatReadingTime(readingMinutes)}`
                   : formatReadingTime(readingMinutes)
               }
@@ -231,5 +231,5 @@ export default async function PostPage({
         </div>
       </div>
     </>
-  );
+  )
 }

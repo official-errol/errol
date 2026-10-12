@@ -4,7 +4,12 @@ const ICONS = {
   info: (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8 7v4M8 5h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path
+        d="M8 7v4M8 5h.01"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   ),
   warning: (
@@ -15,19 +20,35 @@ const ICONS = {
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      <path d="M8 7v3M8 11.5h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path
+        d="M8 7v3M8 11.5h.01"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   ),
   success: (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M5 8l2.5 2.5L11 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M5 8l2.5 2.5L11 6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   ),
   danger: (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path
+        d="M5.5 5.5l5 5M10.5 5.5l-5 5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   ),
 } as const
@@ -71,7 +92,8 @@ export function Callout({
 
   return (
     <div
-      className={`not-prose my-6 border rounded-lg p-4 flex gap-3 ${style.wrap}`}
+      data-mdx-callout
+      className={`my-6 border rounded-lg p-4 flex gap-3 ${style.wrap}`}
     >
       <div className={`shrink-0 mt-0.5 ${style.icon}`}>
         {ICONS[variant]}
@@ -82,7 +104,7 @@ export function Callout({
             {title}
           </p>
         )}
-        <div className="text-sm text-text-secondary leading-relaxed [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+        <div className="text-sm text-text-secondary leading-relaxed">
           {children}
         </div>
       </div>

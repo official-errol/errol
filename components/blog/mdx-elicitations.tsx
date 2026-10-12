@@ -12,7 +12,7 @@ export function Elicitations({
   children: ReactNode
 }) {
   return (
-    <div className="not-prose my-8 border-t border-border pt-6">
+    <div data-mdx-elicitations className="my-8 border-t border-border pt-6">
       {message && (
         <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-3">
           {message}
