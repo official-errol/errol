@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 import { useToast } from '@/components/ui/toast'
+import { CopyIcon, CheckIcon } from '@/components/ui/icons'
 
 export function Elicitations({
   message,
@@ -17,7 +18,7 @@ export function Elicitations({
           {message}
         </p>
       )}
-      <div className="space-y-1">{children}</div>
+      <div className="grid gap-2 sm:grid-cols-2">{children}</div>
     </div>
   )
 }
@@ -48,12 +49,31 @@ export function Elicitation({
       type="button"
       onClick={handleCopy}
       title={query}
-      className="group flex items-center gap-3 w-full text-left py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+      className="group flex items-center gap-3 w-full bg-surface border border-border rounded-lg px-4 py-3 text-left text-sm text-text-primary hover:border-accent hover:bg-accent-subtle transition-colors"
     >
       <span className="shrink-0 text-text-tertiary group-hover:text-accent transition-colors">
-        {copied ? '✓' : '→'}
+        {copied ? (
+          <CheckIcon className="w-4 h-4" />
+        ) : (
+          <CopyIcon className="w-4 h-4" />
+        )}
       </span>
       <span className="flex-1 min-w-0 truncate">{label}</span>
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 16 16"
+        fill="none"
+        className="shrink-0 text-text-tertiary group-hover:text-accent transition-colors"
+      >
+        <path
+          d="M6 3l5 5-5 5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
     </button>
   )
 }

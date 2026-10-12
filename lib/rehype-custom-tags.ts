@@ -1,5 +1,5 @@
 import { visit } from 'unist-util-visit'
-import type { Root, Element } from 'hast'
+import type { Root, Element, Properties } from 'hast'
 
 const CUSTOM_TAGS = new Set([
   'steps',
@@ -21,6 +21,16 @@ export function rehypeCustomTags() {
 
       if (CUSTOM_TAGS.has(tag) && !Array.isArray(node.children)) {
         node.children = []
+      }
+
+      // Normalize attribute keys to lowercase
+      if (CUSTOM_TAGS.has(tag) && node.properties) {
+        const props = node.properties as Properties
+        const normalized: Properties = {}
+        for (const key of Object.keys(props)) {
+          normalized[key.toLowerCase()] = props[key]
+        }
+        node.properties = normalized
       }
     })
   }

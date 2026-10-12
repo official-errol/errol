@@ -4,7 +4,7 @@ export function YouTube({ id, title }: { id: string; title?: string }) {
   return (
     <div
       data-mdx-youtube
-      className="my-8 aspect-video w-full overflow-hidden rounded-lg border border-border"
+      className="my-8 aspect-video w-full overflow-hidden rounded-lg border border-border bg-surface-subtle"
     >
       <iframe
         src={`https://www.youtube.com/embed/${id}`}
