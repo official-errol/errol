@@ -18,3 +18,16 @@ export type UploadResult = {
   bucket: string;
   fullPath: string;
 };
+
+export type Category = {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  sort_order: number
+  created_at: string
+}
+
+export type PostWithCategories = {
+  categories: Pick<Category, "id" | "name" | "slug">[]
+}

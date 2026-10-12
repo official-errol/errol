@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { CalendarIcon, MessageIcon } from "@/components/ui/icons";
 import { TagChips } from "./tag-chips";
+import { CategoryChips } from "./category-chip";
 
 type ReactionCounts = {
   like: number;
   heart: number;
   fire: number;
 };
+
+type CategoryRef = { id: string; name: string; slug: string };
 
 type Post = {
   id: string;
@@ -19,6 +22,7 @@ type Post = {
   comment_count?: number;
   reactions?: ReactionCounts;
   tags?: string[];
+  categories?: CategoryRef[];
 };
 
 const REACTION_EMOJI = {
@@ -51,6 +55,12 @@ export function PostCard({ post }: { post: Post }) {
       </Link>
 
       <div className="p-6 flex-1 flex flex-col">
+        {post.categories && post.categories.length > 0 && (
+          <div className="mb-2">
+            <CategoryChips categories={post.categories} />
+          </div>
+        )}
+
         <Link href={`/blog/${post.slug}`} className="block">
           <h3 className="font-semibold text-text-primary group-hover:text-accent transition-colors mb-2">
             {post.title}

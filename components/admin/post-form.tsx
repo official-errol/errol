@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { ImageUpload } from "./image-upload";
 import { TagInput } from "./tag-input";
+import { CategoryInput } from "./category-input";
 
 export type PostFormValues = {
   id?: string;
@@ -16,6 +17,7 @@ export type PostFormValues = {
   cover_image_url: string;
   published: boolean;
   tags: string[];
+  categories: string[];
 };
 
 function slugify(input: string) {
@@ -42,6 +44,9 @@ export function PostForm({ initial }: { initial?: PostFormValues }) {
   const [published, setPublished] = useState(initial?.published ?? false);
   const [saving, setSaving] = useState(false);
   const [tags, setTags] = useState<string[]>(initial?.tags ?? []);
+  const [categories, setCategories] = useState<string[]>(
+    initial?.categories ?? [],
+  );
 
   function handleTitleChange(value: string) {
     setTitle(value);
@@ -60,6 +65,7 @@ export function PostForm({ initial }: { initial?: PostFormValues }) {
       cover_image_url: coverUrl,
       published,
       tags,
+      categories,
     };
 
     try {
@@ -122,6 +128,13 @@ export function PostForm({ initial }: { initial?: PostFormValues }) {
             maxLength={300}
             className="w-full bg-surface border border-border rounded-sm px-3 py-2 text-sm text-text-primary resize-none focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent-subtle"
           />
+        </Field>
+
+        <Field
+          label="Categories"
+          hint="Up to 3. Used for section pages."
+        >
+          <CategoryInput value={categories} onChange={setCategories} />
         </Field>
 
         <Field label="Tags" hint="Used to filter and find related posts">

@@ -12,7 +12,7 @@ const customComponents = {
   steps: Steps,
   step: Step,
   callout: Callout,
-  elicititations: Elicitations,
+  elicitations: Elicitations,
   elicitation: Elicitation,
   youtube: YouTube,
 } as unknown as Components

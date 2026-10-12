@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { PostForm } from "@/components/admin/post-form";
+import { flattenCategories } from "@/lib/categories";
 
 export default async function EditPostPage({
   params,
@@ -14,12 +15,15 @@ export default async function EditPostPage({
   const { data: post } = await supabase
     .from("posts")
     .select(
-      "id, title, slug, excerpt, content, cover_image_url, published, tags",
+      `id, title, slug, excerpt, content, cover_image_url, published, tags,
+       post_categories ( categories ( id, name, slug ) )`,
     )
     .eq("id", id)
     .single();
 
   if (!post) notFound();
+
+  const categories = flattenCategories(post.post_categories).map((c) => c.slug);
 
   return (
     <div className="space-y-8">
@@ -42,6 +46,7 @@ export default async function EditPostPage({
           cover_image_url: post.cover_image_url ?? "",
           published: post.published,
           tags: post.tags ?? [],
+          categories,
         }}
       />
     </div>

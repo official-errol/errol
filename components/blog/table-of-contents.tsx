@@ -41,9 +41,9 @@ export function TableOfContentsDesktop({ items }: { items: TocItem[] }) {
       aria-label="Table of contents"
       className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
     >
-      <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-3">
-        On this page
-      </p>
+      <p className="text-sm font-medium text-text-secondary mb-3">
+  On this page
+</p>
       <ul className="space-y-0.5 border-l border-border">
         {items.map((item) => {
           const isActive = activeId === item.id;

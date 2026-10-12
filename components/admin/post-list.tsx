@@ -13,6 +13,8 @@ import {
   CalendarIcon,
 } from "@/components/ui/icons";
 
+type CategoryRef = { id: string; name: string; slug: string };
+
 type Post = {
   id: string;
   slug: string;
@@ -23,6 +25,7 @@ type Post = {
   created_at: string;
   updated_at: string;
   tags: string[];
+  categories: CategoryRef[];
 };
 
 function formatDate(d: string) {
@@ -82,6 +85,7 @@ export function PostList({ posts }: { posts: Post[] }) {
             <tr className="text-left text-xs uppercase tracking-wide text-text-secondary">
               <th className="px-4 py-3 font-medium w-20">Cover</th>
               <th className="px-4 py-3 font-medium">Title</th>
+              <th className="px-4 py-3 font-medium">Category</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 font-medium">Updated</th>
               <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -121,6 +125,22 @@ export function PostList({ posts }: { posts: Post[] }) {
                           +{post.tags.length - 4}
                         </span>
                       )}
+                    </div>
+                  )}
+                </td>
+                <td className="px-4 py-3 align-top">
+                  {post.categories.length === 0 ? (
+                    <span className="text-xs text-text-tertiary">—</span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {post.categories.map((cat) => (
+                        <span
+                          key={cat.id}
+                          className="text-xs px-1.5 py-0.5 bg-accent-subtle text-accent rounded-sm font-mono"
+                        >
+                          {cat.slug}
+                        </span>
+                      ))}
                     </div>
                   )}
                 </td>
@@ -214,6 +234,19 @@ export function PostList({ posts }: { posts: Post[] }) {
                   /{post.slug}
                 </p>
               </div>
+
+              {post.categories.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {post.categories.map((cat) => (
+                    <span
+                      key={cat.id}
+                      className="text-xs px-1.5 py-0.5 bg-accent-subtle text-accent rounded-sm font-mono"
+                    >
+                      {cat.slug}
+                    </span>
+                  ))}
+                </div>
+              )}
 
               {post.tags && post.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1">

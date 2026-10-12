@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
-import { useToast } from '@/components/ui/toast'
-import { CopyIcon, CheckIcon } from '@/components/ui/icons'
 
 export function Elicitations({
   message,
@@ -12,10 +10,12 @@ export function Elicitations({
   children: ReactNode
 }) {
   return (
-    <div data-mdx-elicitations className="my-8">
-      <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-3">
-        {message ?? 'Explore further'}
-      </p>
+    <div data-mdx-elicitations className="not-prose my-8">
+      {message && (
+        <p className="text-base text-text-secondary leading-relaxed mb-3">
+          {message}
+        </p>
+      )}
       <div className="divide-y divide-border border-y border-border">
         {children}
       </div>
@@ -30,50 +30,41 @@ export function Elicitation({
   label: string
   query: string
 }) {
-  const { toast } = useToast()
-  const [copied, setCopied] = useState(false)
-
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(query)
-      setCopied(true)
-      toast('Query copied to clipboard', 'success')
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      toast('Could not copy', 'error')
-    }
-  }
+  const [open, setOpen] = useState(false)
 
   return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      title={query}
-      className="group flex items-center gap-3 w-full py-3 text-left text-sm text-text-secondary hover:text-text-primary transition-colors"
-    >
-      <span className="shrink-0 text-text-tertiary group-hover:text-accent transition-colors">
-        {copied ? (
-          <CheckIcon className="w-3.5 h-3.5" />
-        ) : (
-          <CopyIcon className="w-3.5 h-3.5" />
-        )}
-      </span>
-      <span className="flex-1 min-w-0 truncate">{label}</span>
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 16 16"
-        fill="none"
-        className="shrink-0 text-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity"
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="group flex items-center gap-3 w-full py-3 text-left text-base text-text-primary hover:text-accent transition-colors"
       >
-        <path
-          d="M6 3l5 5-5 5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
+        <span className="flex-1 min-w-0 font-medium">{label}</span>
+        <span
+          className={`shrink-0 text-text-tertiary transition-transform duration-150 ${
+            open ? 'rotate-90' : ''
+          }`}
+        >
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M6 3l5 5-5 5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      </button>
+
+      {open && (
+        <div className="pb-3">
+          <p className="text-base text-text-secondary leading-relaxed">
+            {query}
+          </p>
+        </div>
+      )}
+    </div>
   )
 }

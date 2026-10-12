@@ -21,7 +21,13 @@ const ICONS = {
   success: (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
       <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M5 8l2.5 2.5L11 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M5 8l2.5 2.5L11 6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   ),
   danger: (
@@ -33,10 +39,10 @@ const ICONS = {
 } as const
 
 const VARIANTS = {
-  info: { icon: 'text-accent', label: 'Note' },
-  warning: { icon: 'text-warning', label: 'Warning' },
-  success: { icon: 'text-success', label: 'Success' },
-  danger: { icon: 'text-error', label: 'Danger' },
+  info: { border: 'border-l-accent', icon: 'text-accent', label: 'Note' },
+  warning: { border: 'border-l-warning', icon: 'text-warning', label: 'Warning' },
+  success: { border: 'border-l-success', icon: 'text-success', label: 'Success' },
+  danger: { border: 'border-l-error', icon: 'text-error', label: 'Danger' },
 } as const
 
 type Variant = keyof typeof VARIANTS
@@ -56,15 +62,15 @@ export function Callout({
   return (
     <div
       data-mdx-callout
-      className="my-8 border-y border-border py-5"
+      className={`not-prose my-6 border-l-2 pl-4 ${style.border}`}
     >
       <div className="flex items-center gap-2 mb-2">
         <span className={`shrink-0 ${style.icon}`}>{ICONS[variant]}</span>
-        <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono">
+        <p className="text-base font-semibold text-text-primary">
           {title ?? style.label}
         </p>
       </div>
-      <div className="text-sm text-text-secondary leading-relaxed">
+      <div className="text-base text-text-secondary leading-relaxed space-y-3 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
         {children}
       </div>
     </div>

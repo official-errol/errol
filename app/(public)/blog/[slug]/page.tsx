@@ -28,11 +28,11 @@ export async function generateMetadata({
   const { slug } = await params
   const supabase = await createClient()
   const { data: post } = await supabase
-    .from('posts')
-    .select('title, excerpt, cover_image_url, published_at')
-    .eq('slug', slug)
-    .eq('published', true)
-    .single()
+  .from("posts")
+  .select("title, excerpt, cover_image_url, published_at")
+  .eq("slug", slug)
+  .eq("published", true)
+  .single()
 
   if (!post) return { title: 'Post not found' }
 
@@ -72,13 +72,14 @@ export default async function PostPage({
   } = await supabase.auth.getUser()
 
   const { data: post } = await supabase
-    .from('posts')
-    .select(
-      'id, slug, title, excerpt, content, cover_image_url, published_at, author_id, tags'
-    )
-    .eq('slug', slug)
-    .eq('published', true)
-    .single()
+  .from("posts")
+  .select(
+    `id, slug, title, excerpt, content, cover_image_url, published_at, author_id, tags,
+     post_categories ( categories ( id, name, slug ) )`,
+  )
+  .eq("slug", slug)
+  .eq("published", true)
+  .single()
 
   if (!post) notFound()
 
@@ -183,7 +184,7 @@ export default async function PostPage({
 
             {post.tags && post.tags.length > 0 && (
               <div className="mb-10 pb-8 border-b border-border">
-                <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-3">
+                <p className="text-sm font-medium text-text-secondary mb-3">
                   Tagged with
                 </p>
                 <TagChips tags={post.tags} size="md" />

@@ -6,29 +6,39 @@ import { PostCard } from "@/components/blog/post-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getReadingTime } from "@/lib/reading-time";
 import { RssIcon, XIcon } from "@/components/ui/icons";
+import { flattenCategories } from "@/lib/categories";
 
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ tag?: string }>;
+  searchParams: Promise<{ tag?: string; category?: string }>;
 }): Promise<Metadata> {
-  const { tag } = await searchParams;
+  const { tag, category } = await searchParams;
   const cleanTag = tag?.trim().toLowerCase();
+  const cleanCategory = category?.trim().toLowerCase();
 
-  return {
-    title: cleanTag ? `Posts tagged #${cleanTag}` : "Blog",
-    description: cleanTag
-      ? `Posts tagged with #${cleanTag} by Errol.`
-      : "Notes, thoughts, and things I have learned while building software and side projects.",
-    alternates: {
-      canonical: cleanTag
-        ? `https://errolsolomon.vercel.app/blog?tag=${encodeURIComponent(cleanTag)}`
-        : "https://errolsolomon.vercel.app/blog",
-    },
-  };
+  const title = cleanTag
+    ? `Posts tagged #${cleanTag}`
+    : cleanCategory
+      ? `Posts in ${cleanCategory}`
+      : "Blog";
+
+  const description = cleanTag
+    ? `Posts tagged with #${cleanTag} by Errol.`
+    : cleanCategory
+      ? `Posts in the ${cleanCategory} category by Errol.`
+      : "Notes, thoughts, and things I have learned while building software and side projects.";
+
+  const canonical = cleanTag
+    ? `https://errolsolomon.vercel.app/blog?tag=${encodeURIComponent(cleanTag)}`
+    : cleanCategory
+      ? `https://errolsolomon.vercel.app/blog?category=${encodeURIComponent(cleanCategory)}`
+      : "https://errolsolomon.vercel.app/blog";
+
+  return { title, description, alternates: { canonical } };
 }
 
-type SearchParams = Promise<{ tag?: string }>;
+type SearchParams = Promise<{ tag?: string; category?: string }>;
 
 export default async function BlogPage({
   searchParams,
@@ -37,19 +47,50 @@ export default async function BlogPage({
 }) {
   const params = await searchParams;
   const activeTag = params.tag?.trim().toLowerCase() || null;
+  const activeCategory = params.category?.trim().toLowerCase() || null;
 
   const supabase = await createClient();
+
+  // Resolve category slug → id if a category filter is active
+  let categoryPostIds: string[] | null = null;
+  if (activeCategory) {
+    const { data: cat } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", activeCategory)
+      .maybeSingle();
+
+    if (cat) {
+      const { data: links } = await supabase
+        .from("post_categories")
+        .select("post_id")
+        .eq("category_id", cat.id);
+      categoryPostIds = (links ?? []).map((l) => l.post_id);
+    } else {
+      categoryPostIds = [];
+    }
+  }
 
   let query = supabase
     .from("posts")
     .select(
-      "id, slug, title, excerpt, content, cover_image_url, published_at, tags",
+      `id, slug, title, excerpt, content, cover_image_url, published_at, tags,
+       post_categories ( categories ( id, name, slug ) )`,
     )
     .eq("published", true)
     .order("published_at", { ascending: false });
 
   if (activeTag) {
     query = query.contains("tags", [activeTag]);
+  }
+
+  if (categoryPostIds) {
+    if (categoryPostIds.length === 0) {
+      // No posts in this category — force empty result
+      query = query.in("id", ["00000000-0000-0000-0000-000000000000"]);
+    } else {
+      query = query.in("id", categoryPostIds);
+    }
   }
 
   const { data } = await query;
@@ -83,18 +124,35 @@ export default async function BlogPage({
     }
   }
 
+  // Fetch category list for the filter row
+  const { data: allCategories } = await supabase
+    .from("categories")
+    .select("id, name, slug")
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+
+  const hasFilter = Boolean(activeTag || activeCategory);
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
       <PublicPageHeader
         breadcrumbs={[{ label: "Portfolio", href: "/" }, { label: "Blog" }]}
-        title={activeTag ? `#${activeTag}` : "Blog"}
+        title={
+          activeTag
+            ? `#${activeTag}`
+            : activeCategory
+              ? activeCategory
+              : "Blog"
+        }
         description={
           activeTag
             ? `Posts tagged #${activeTag}.`
-            : "Notes, thoughts, and things I've learned."
+            : activeCategory
+              ? `Posts in the ${activeCategory} category.`
+              : "Notes, thoughts, and things I've learned."
         }
         action={
-          activeTag ? (
+          hasFilter ? (
             <Link
               href="/blog"
               className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
@@ -117,12 +175,53 @@ export default async function BlogPage({
         }
       />
 
+      {/* Category filter row */}
+      {allCategories && allCategories.length > 0 && (
+        <div className="mb-8 flex flex-wrap gap-2">
+          <Link
+            href={activeTag ? `/blog?tag=${encodeURIComponent(activeTag)}` : "/blog"}
+            className={`text-xs px-2.5 py-1 rounded-sm font-mono transition-colors ${
+              !activeCategory
+                ? "bg-accent text-text-inverse"
+                : "bg-surface-subtle text-text-secondary hover:bg-accent-subtle hover:text-accent"
+            }`}
+          >
+            All
+          </Link>
+          {allCategories.map((cat) => {
+            const href = activeTag
+              ? `/blog?tag=${encodeURIComponent(activeTag)}&category=${encodeURIComponent(cat.slug)}`
+              : `/blog?category=${encodeURIComponent(cat.slug)}`;
+            const isActive = activeCategory === cat.slug;
+            return (
+              <Link
+                key={cat.id}
+                href={href}
+                className={`text-xs px-2.5 py-1 rounded-sm font-mono transition-colors ${
+                  isActive
+                    ? "bg-accent text-text-inverse"
+                    : "bg-surface-subtle text-text-secondary hover:bg-accent-subtle hover:text-accent"
+                }`}
+              >
+                {cat.slug}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
       {posts.length === 0 ? (
         <EmptyState
-          title={activeTag ? `No posts tagged #${activeTag}` : "No posts yet"}
-          description={activeTag ? "Try a different tag." : "Check back soon."}
+          title={
+            activeTag
+              ? `No posts tagged #${activeTag}`
+              : activeCategory
+                ? `No posts in ${activeCategory}`
+                : "No posts yet"
+          }
+          description={hasFilter ? "Try a different filter." : "Check back soon."}
           action={
-            activeTag ? (
+            hasFilter ? (
               <Link
                 href="/blog"
                 className="inline-block px-4 py-2 border border-border text-text-primary rounded-md text-sm hover:bg-surface-subtle transition-colors"
@@ -134,23 +233,28 @@ export default async function BlogPage({
         />
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={{
-                id: post.id,
-                slug: post.slug,
-                title: post.title,
-                excerpt: post.excerpt,
-                cover_image_url: post.cover_image_url,
-                published_at: post.published_at,
-                reading_minutes: getReadingTime(post.content),
-                comment_count: commentCounts[post.id] ?? 0,
-                reactions: reactionCounts[post.id],
-                tags: post.tags ?? [],
-              }}
-            />
-          ))}
+          {posts.map((post) => {
+            const categories = flattenCategories(post.post_categories)
+
+            return (
+              <PostCard
+                key={post.id}
+                post={{
+                  id: post.id,
+                  slug: post.slug,
+                  title: post.title,
+                  excerpt: post.excerpt,
+                  cover_image_url: post.cover_image_url,
+                  published_at: post.published_at,
+                  reading_minutes: getReadingTime(post.content),
+                  comment_count: commentCounts[post.id] ?? 0,
+                  reactions: reactionCounts[post.id],
+                  tags: post.tags ?? [],
+                  categories,
+                }}
+              />
+            );
+          })}
         </div>
       )}
     </div>

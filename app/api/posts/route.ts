@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { MAX_CATEGORIES_PER_POST, normalizeCategory } from "@/lib/categories";
 
 function slugify(input: string) {
   return input
@@ -9,6 +10,53 @@ function slugify(input: string) {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .slice(0, 80);
+}
+
+async function syncCategories(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  postId: string,
+  rawCategories: string[],
+) {
+  const slugs = Array.from(
+    new Set(
+      rawCategories
+        .map((c) => normalizeCategory(c))
+        .filter(Boolean)
+        .slice(0, MAX_CATEGORIES_PER_POST),
+    ),
+  );
+
+  // Wipe existing links, then re-insert. Simple and correct for <=3 rows.
+  await supabase.from("post_categories").delete().eq("post_id", postId);
+
+  if (slugs.length === 0) return;
+
+  // Upsert by slug, preserving existing names.
+  const { data: existing } = await supabase
+    .from("categories")
+    .select("id, slug")
+    .in("slug", slugs);
+
+  const existingMap = new Map((existing ?? []).map((c) => [c.slug, c.id]));
+  const missing = slugs.filter((s) => !existingMap.has(s));
+
+  if (missing.length > 0) {
+    const { data: created } = await supabase
+      .from("categories")
+      .insert(missing.map((slug) => ({ name: slug, slug })))
+      .select("id, slug");
+
+    for (const c of created ?? []) existingMap.set(c.slug, c.id);
+  }
+
+  const links = slugs
+    .map((slug) => existingMap.get(slug))
+    .filter((id): id is string => Boolean(id))
+    .map((category_id) => ({ post_id: postId, category_id }));
+
+  if (links.length > 0) {
+    await supabase.from("post_categories").insert(links);
+  }
 }
 
 export async function POST(request: Request) {
@@ -32,16 +80,25 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { title, slug, excerpt, content, cover_image_url, published, tags } =
-    body as {
-      title?: string;
-      slug?: string;
-      excerpt?: string;
-      content?: string;
-      cover_image_url?: string;
-      published?: boolean;
-      tags?: string[];
-    };
+  const {
+    title,
+    slug,
+    excerpt,
+    content,
+    cover_image_url,
+    published,
+    tags,
+    categories,
+  } = body as {
+    title?: string;
+    slug?: string;
+    excerpt?: string;
+    content?: string;
+    cover_image_url?: string;
+    published?: boolean;
+    tags?: string[];
+    categories?: string[];
+  };
 
   if (!title?.trim() || !content?.trim()) {
     return NextResponse.json(
@@ -90,6 +147,10 @@ export async function POST(request: Request) {
       );
     }
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (Array.isArray(categories) && categories.length > 0) {
+    await syncCategories(supabase, data.id, categories);
   }
 
   return NextResponse.json({ post: data });
