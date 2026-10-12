@@ -116,3 +116,9 @@ body {
   image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
 }
+
+/* Fix for nested prose inside custom components */
+.prose [data-custom="callout"],
+.prose [data-custom="steps"] {
+  @apply not-prose;
+}

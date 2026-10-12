@@ -1,7 +1,4 @@
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeSlug from "rehype-slug";
 import { createClient } from "@/lib/supabase/server";
 import { CommentList, type Comment } from "@/components/blog/comment-list";
 import { CommentForm } from "@/components/blog/comment-form";
@@ -19,6 +16,7 @@ import { SignInPrompt } from "@/components/auth/sign-in-prompt";
 import { getReadingTime, formatReadingTime } from "@/lib/reading-time";
 import { extractToc } from "@/lib/toc";
 import { getRelatedPosts } from "@/lib/related-posts";
+import { MarkdownRenderer } from '@/components/blog/markdown-renderer'
 
 const BASE_URL = "https://errolsolomon.vercel.app";
 
@@ -179,12 +177,7 @@ export default async function PostPage({
             )}
 
             <div className="prose prose-neutral dark:prose-invert max-w-none mb-12">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeSlug]}
-              >
-                {post.content}
-              </ReactMarkdown>
+              <MarkdownRenderer content={post.content} />
               <CodeBlockEnhancer />
             </div>
 
