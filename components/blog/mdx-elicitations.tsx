@@ -12,13 +12,11 @@ export function Elicitations({
   children: ReactNode
 }) {
   return (
-    <div data-mdx-elicitations className="my-10 pt-8 border-t border-border">
-      {message && (
-        <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-4">
-          {message}
-        </p>
-      )}
-      <div className="space-y-1">
+    <div data-mdx-elicitations className="my-8">
+      <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-3">
+        {message ?? 'Explore further'}
+      </p>
+      <div className="divide-y divide-border border-y border-border">
         {children}
       </div>
     </div>
@@ -51,7 +49,7 @@ export function Elicitation({
       type="button"
       onClick={handleCopy}
       title={query}
-      className="group flex items-center gap-3 w-full py-2.5 text-left text-sm text-text-secondary hover:text-text-primary transition-colors"
+      className="group flex items-center gap-3 w-full py-3 text-left text-sm text-text-secondary hover:text-text-primary transition-colors"
     >
       <span className="shrink-0 text-text-tertiary group-hover:text-accent transition-colors">
         {copied ? (
@@ -66,7 +64,7 @@ export function Elicitation({
         height="12"
         viewBox="0 0 16 16"
         fill="none"
-        className="shrink-0 text-text-tertiary opacity-0 group-hover:opacity-100 group-hover:text-accent transition-all"
+        className="shrink-0 text-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <path
           d="M6 3l5 5-5 5"

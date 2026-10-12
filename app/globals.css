@@ -121,7 +121,7 @@ body {
    MDX Custom Components
    ======================== */
 
-/* Reset prose styling inside our custom components */
+/* Reset prose defaults inside custom components */
 .prose [data-mdx-steps],
 .prose [data-mdx-steps] *,
 .prose [data-mdx-callout],
@@ -130,29 +130,24 @@ body {
 .prose [data-mdx-elicitations] *,
 .prose [data-mdx-youtube],
 .prose [data-mdx-youtube] * {
-  margin: 0;
-  padding: 0;
-  border: 0;
   font-size: inherit;
   line-height: inherit;
 }
 
-/* Restore paragraph spacing inside callout body */
-.prose [data-mdx-callout] p {
+/* Callout and Steps body paragraph spacing */
+.prose [data-mdx-callout] p,
+.prose [data-mdx-steps] p {
   margin: 0.5rem 0;
 }
 
-.prose [data-mdx-callout] > div:last-child > *:first-child {
+.prose [data-mdx-callout] > div:last-child > *:first-child,
+.prose [data-mdx-steps] > div > div:last-child > *:first-child {
   margin-top: 0;
 }
 
-.prose [data-mdx-callout] > div:last-child > *:last-child {
+.prose [data-mdx-callout] > div:last-child > *:last-child,
+.prose [data-mdx-steps] > div > div:last-child > *:last-child {
   margin-bottom: 0;
-}
-
-/* Steps body paragraph spacing */
-.prose [data-mdx-steps] p {
-  margin: 0.25rem 0;
 }
 
 /* YouTube border */
