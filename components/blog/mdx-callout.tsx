@@ -32,34 +32,30 @@ const ICONS = {
   ),
 } as const
 
-const STYLES = {
+const VARIANTS = {
   info: {
-    wrap: 'bg-surface border-border',
-    iconWrap: 'bg-accent-subtle text-accent',
-    title: 'text-text-primary',
+    border: 'border-accent/40',
+    icon: 'text-accent',
     label: 'Note',
   },
   warning: {
-    wrap: 'bg-surface border-border',
-    iconWrap: 'bg-warning/10 text-warning',
-    title: 'text-text-primary',
+    border: 'border-warning/50',
+    icon: 'text-warning',
     label: 'Warning',
   },
   success: {
-    wrap: 'bg-surface border-border',
-    iconWrap: 'bg-success/10 text-success',
-    title: 'text-text-primary',
+    border: 'border-success/50',
+    icon: 'text-success',
     label: 'Success',
   },
   danger: {
-    wrap: 'bg-surface border-border',
-    iconWrap: 'bg-error/10 text-error',
-    title: 'text-text-primary',
+    border: 'border-error/50',
+    icon: 'text-error',
     label: 'Danger',
   },
 } as const
 
-type CalloutType = keyof typeof STYLES
+type Variant = keyof typeof VARIANTS
 
 export function Callout({
   type = 'info',
@@ -70,26 +66,22 @@ export function Callout({
   title?: string
   children: ReactNode
 }) {
-  const variant = (type in STYLES ? type : 'info') as CalloutType
-  const style = STYLES[variant]
+  const variant = (type in VARIANTS ? type : 'info') as Variant
+  const style = VARIANTS[variant]
 
   return (
     <div
       data-mdx-callout
-      className={`my-6 border rounded-lg p-5 flex gap-4 ${style.wrap}`}
+      className={`my-8 border-l-2 pl-5 ${style.border}`}
     >
-      <div
-        className={`shrink-0 w-8 h-8 rounded-md flex items-center justify-center ${style.iconWrap}`}
-      >
-        {ICONS[variant]}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-text-primary mb-2">
+      <div className="flex items-center gap-2 mb-2">
+        <span className={`shrink-0 ${style.icon}`}>{ICONS[variant]}</span>
+        <p className="text-sm font-semibold text-text-primary">
           {title ?? style.label}
         </p>
-        <div className="text-sm text-text-secondary leading-relaxed">
-          {children}
-        </div>
+      </div>
+      <div className="text-sm text-text-secondary leading-relaxed">
+        {children}
       </div>
     </div>
   )

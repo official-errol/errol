@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 export function Steps({ children }: { children: ReactNode }) {
   return (
-    <div data-mdx-steps className="my-8 space-y-3">
+    <div data-mdx-steps className="my-10 space-y-8">
       {children}
     </div>
   )
@@ -18,25 +18,23 @@ export function Step({
   children: ReactNode
 }) {
   return (
-    <div className="bg-surface border border-border rounded-lg p-5">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-full bg-accent-subtle text-accent text-xs font-semibold font-mono">
-            ●
-          </span>
-          {title && (
-            <h3 className="text-base font-semibold text-text-primary m-0">
-              {title}
-            </h3>
-          )}
-        </div>
+    <div className="relative pl-8">
+      <div className="absolute left-0 top-[7px] w-2.5 h-2.5 rounded-full border-2 border-accent bg-background" />
+
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 mb-1">
+        {title && (
+          <h3 className="text-lg font-semibold text-text-primary m-0">
+            {title}
+          </h3>
+        )}
         {subtitle && (
-          <span className="shrink-0 text-xs px-2 py-0.5 bg-surface-subtle text-text-tertiary rounded-sm font-mono">
+          <span className="inline-flex items-center gap-1.5 text-xs text-text-tertiary font-mono">
             {subtitle}
           </span>
         )}
       </div>
-      <div className="text-sm text-text-secondary leading-relaxed pl-10">
+
+      <div className="text-sm text-text-secondary leading-relaxed">
         {children}
       </div>
     </div>
