@@ -6,6 +6,7 @@ import { rehypeCustomTags } from '@/lib/rehype-custom-tags'
 import { Steps, Step } from './mdx-steps'
 import { Callout } from './mdx-callout'
 import { Elicitations, Elicitation } from './mdx-elicitations'
+import { YouTube } from './mdx-youtube'
 
 const customComponents = {
   steps: Steps,
@@ -13,6 +14,7 @@ const customComponents = {
   callout: Callout,
   elicititations: Elicitations,
   elicitation: Elicitation,
+  youtube: YouTube,
 } as unknown as Components
 
 export function MarkdownRenderer({ content }: { content: string }) {

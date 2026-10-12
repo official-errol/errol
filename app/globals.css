@@ -121,19 +121,20 @@ body {
    MDX Custom Components
    ======================== */
 
-/* Reset prose styling inside custom MDX components */
 .prose [data-mdx-steps],
 .prose [data-mdx-steps] *,
 .prose [data-mdx-callout],
 .prose [data-mdx-callout] *,
 .prose [data-mdx-elicitations],
-.prose [data-mdx-elicitations] * {
-  font-size: inherit;
-  line-height: inherit;
-  color: inherit;
+.prose [data-mdx-elicitations] *,
+.prose [data-mdx-youtube],
+.prose [data-mdx-youtube] * {
   margin: 0;
   padding: 0;
   border: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
 }
 
 /* Restore paragraph spacing inside callout body */
@@ -141,15 +142,25 @@ body {
   margin: 0.5rem 0;
 }
 
-.prose [data-mdx-callout] > div > div > *:first-child {
+.prose [data-mdx-callout] > div > *:first-child {
   margin-top: 0;
 }
 
-.prose [data-mdx-callout] > div > div > *:last-child {
+.prose [data-mdx-callout] > div > *:last-child {
   margin-bottom: 0;
 }
 
-/* Restore paragraph spacing inside steps */
+/* Callout label keeps its own color */
+.prose [data-mdx-callout] > p:first-child {
+  color: inherit;
+}
+
+/* Steps children keep spacing between paragraphs */
 .prose [data-mdx-steps] p {
   margin: 0.25rem 0;
+}
+
+/* YouTube iframe needs its border restored */
+.prose [data-mdx-youtube] {
+  border: 1px solid var(--color-border);
 }

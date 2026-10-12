@@ -1,82 +1,29 @@
 import type { ReactNode } from 'react'
 
-const ICONS = {
-  info: (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M8 7v4M8 5h.01"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  ),
-  warning: (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path
-        d="M8 2L14.5 13H1.5L8 2z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M8 7v3M8 11.5h.01"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  ),
-  success: (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M5 8l2.5 2.5L11 6"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  ),
-  danger: (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M5.5 5.5l5 5M10.5 5.5l-5 5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  ),
-} as const
-
-const STYLES = {
+const VARIANTS = {
   info: {
-    wrap: 'bg-accent-subtle/50 border-accent/30',
-    icon: 'text-accent',
-    title: 'text-accent',
+    border: 'border-l-accent',
+    text: 'text-accent',
+    label: 'Note',
   },
   warning: {
-    wrap: 'bg-warning/10 border-warning/30',
-    icon: 'text-warning',
-    title: 'text-warning',
+    border: 'border-l-warning',
+    text: 'text-warning',
+    label: 'Warning',
   },
   success: {
-    wrap: 'bg-success/10 border-success/30',
-    icon: 'text-success',
-    title: 'text-success',
+    border: 'border-l-success',
+    text: 'text-success',
+    label: 'Success',
   },
   danger: {
-    wrap: 'bg-error/10 border-error/30',
-    icon: 'text-error',
-    title: 'text-error',
+    border: 'border-l-error',
+    text: 'text-error',
+    label: 'Danger',
   },
 } as const
 
-type CalloutType = keyof typeof STYLES
+type Variant = keyof typeof VARIANTS
 
 export function Callout({
   type = 'info',
@@ -87,26 +34,19 @@ export function Callout({
   title?: string
   children: ReactNode
 }) {
-  const variant = (type in STYLES ? type : 'info') as CalloutType
-  const style = STYLES[variant]
+  const variant = (type in VARIANTS ? type : 'info') as Variant
+  const style = VARIANTS[variant]
 
   return (
     <div
       data-mdx-callout
-      className={`my-6 border rounded-lg p-4 flex gap-3 ${style.wrap}`}
+      className={`my-6 border-l-2 pl-4 ${style.border}`}
     >
-      <div className={`shrink-0 mt-0.5 ${style.icon}`}>
-        {ICONS[variant]}
-      </div>
-      <div className="min-w-0 flex-1">
-        {title && (
-          <p className={`text-sm font-semibold mb-1.5 ${style.title}`}>
-            {title}
-          </p>
-        )}
-        <div className="text-sm text-text-secondary leading-relaxed">
-          {children}
-        </div>
+      <p className={`text-xs uppercase tracking-wide font-mono mb-2 ${style.text}`}>
+        {title ?? style.label}
+      </p>
+      <div className="text-sm text-text-secondary leading-relaxed">
+        {children}
       </div>
     </div>
   )

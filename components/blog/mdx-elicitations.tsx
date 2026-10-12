@@ -2,7 +2,6 @@
 
 import { useState, type ReactNode } from 'react'
 import { useToast } from '@/components/ui/toast'
-import { CopyIcon, CheckIcon } from '@/components/ui/icons'
 
 export function Elicitations({
   message,
@@ -12,13 +11,13 @@ export function Elicitations({
   children: ReactNode
 }) {
   return (
-    <div data-mdx-elicitations className="my-8 border-t border-border pt-6">
+    <div data-mdx-elicitations className="my-8">
       {message && (
         <p className="text-xs uppercase tracking-wide text-text-tertiary font-mono mb-3">
           {message}
         </p>
       )}
-      <div className="flex flex-wrap gap-2">{children}</div>
+      <div className="space-y-1">{children}</div>
     </div>
   )
 }
@@ -49,16 +48,12 @@ export function Elicitation({
       type="button"
       onClick={handleCopy}
       title={query}
-      className="group inline-flex items-center gap-2 text-sm px-3 py-2 bg-surface border border-border rounded-md text-text-primary hover:border-accent hover:bg-accent-subtle transition-colors text-left"
+      className="group flex items-center gap-3 w-full text-left py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
     >
       <span className="shrink-0 text-text-tertiary group-hover:text-accent transition-colors">
-        {copied ? (
-          <CheckIcon className="w-3.5 h-3.5" />
-        ) : (
-          <CopyIcon className="w-3.5 h-3.5" />
-        )}
+        {copied ? '✓' : '→'}
       </span>
-      <span>{label}</span>
+      <span className="flex-1 min-w-0 truncate">{label}</span>
     </button>
   )
 }

@@ -7,6 +7,7 @@ const CUSTOM_TAGS = new Set([
   'callout',
   'elicitations',
   'elicitation',
+  'youtube',
 ])
 
 export function rehypeCustomTags() {
