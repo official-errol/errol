@@ -36,10 +36,10 @@ export default async function PublicLayout({
 
   const orgJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "Person",
     name: "Errol",
     url: "https://errolsolomon.vercel.app",
-    logo: "https://errolsolomon.vercel.app/logo.png",
+    image: "https://errolsolomon.vercel.app/logo.png",
   };
 
   return (
@@ -63,24 +63,127 @@ export default async function PublicLayout({
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-border bg-surface">
-        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm text-text-secondary">
-          <p>© {new Date().getFullYear()} Errol</p>
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            <Link href="/shop" className="hover:text-text-primary">
-              Shop
-            </Link>
-            <Link href="/tools" className="hover:text-text-primary">
-              Tools
-            </Link>
-            <Link href="/privacy" className="hover:text-text-primary">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-text-primary">
-              Terms
-            </Link>
-          </div>
+  <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="flex flex-wrap items-start justify-between gap-10">
+      <div className="max-w-xs">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 font-semibold text-text-primary mb-2"
+        >
+          <img src="/8ball.png" alt="" className="w-5 h-5" />
+          Errol
+        </Link>
+        <p className="text-xs text-text-secondary leading-relaxed">
+          A personal workshop for things worth building.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-x-6 sm:gap-x-12 gap-y-6 text-sm">
+        <div>
+          <p className="text-xs font-medium text-text-tertiary mb-3">
+            Site
+          </p>
+          <ul className="space-y-2">
+            <li>
+              <Link
+                href="/projects"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Projects
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/blog"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Blog
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/files"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Files
+              </Link>
+            </li>
+          </ul>
         </div>
-      </footer>
+
+        <div>
+          <p className="text-xs font-medium text-text-tertiary mb-3">
+            More
+          </p>
+          <ul className="space-y-2">
+            <li>
+              <Link
+                href="/shop"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Shop
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/tools"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Tools
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/contact"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Contact
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-text-tertiary mb-3">
+            Legal
+          </p>
+          <ul className="space-y-2">
+            <li>
+              <Link
+                href="/privacy"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Privacy
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/terms"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Terms
+              </Link>
+            </li>
+            <li>
+              <a
+                href="/rss.xml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                RSS
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-12 pt-6 border-t border-border flex flex-wrap items-center justify-between gap-3 text-xs text-text-tertiary">
+      <p>© {new Date().getFullYear()} Errol</p>
+    </div>
+  </div>
+</footer>
 
       <BackToTop />
     </div>

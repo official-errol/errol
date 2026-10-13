@@ -36,31 +36,22 @@ export function ProjectCard({ project }: { project: Project }) {
       </Link>
 
       <div className="p-5 flex-1 flex flex-col">
-        <div className="flex items-start gap-2 mb-1.5">
+        <div className="relative mb-1.5">
           {faviconUrl && (
             <FaviconImage
               src={faviconUrl}
               size={16}
-              className="w-4 h-4 mt-1 rounded-sm shrink-0"
+              className="w-4 h-4 rounded-sm absolute left-0 top-1"
             />
           )}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <Link
-                href={`/projects/${project.slug}`}
-                className="block min-w-0"
-              >
-                <h3 className="font-semibold text-text-primary group-hover:text-accent transition-colors">
-                  {project.title}
-                </h3>
-              </Link>
-              {project.featured && (
-                <span className="text-xs px-1.5 py-0.5 bg-accent-subtle text-accent rounded-sm shrink-0">
-                  Featured
-                </span>
-              )}
-            </div>
-          </div>
+          <Link href={`/projects/${project.slug}`} className="block min-w-0">
+            <h3
+              className="font-semibold text-text-primary group-hover:text-accent transition-colors leading-6"
+              style={{ textIndent: "1.5rem" }}
+            >
+              {project.title}
+            </h3>
+          </Link>
         </div>
 
         {project.summary && (

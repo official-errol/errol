@@ -46,19 +46,28 @@ function formatRange(
 function SectionHeader({
   icon: Icon,
   title,
+  description,
   action,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
+  description?: string;
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-end justify-between mb-10" data-character-ignore>
-      <h2 className="flex items-center gap-2.5 text-2xl md:text-3xl font-semibold text-text-primary">
-        <Icon className="w-5 h-5 text-text-secondary" />
-        {title}
-      </h2>
-      {action}
+    <div className="mb-10" data-character-ignore>
+      <div className="flex items-end justify-between gap-4">
+        <h2 className="flex items-center gap-2.5 text-2xl md:text-3xl font-semibold text-text-primary">
+          <Icon className="w-5 h-5 text-text-secondary" />
+          {title}
+        </h2>
+        {action}
+      </div>
+      {description && (
+        <p className="text-sm text-text-secondary mt-3 max-w-2xl">
+          {description}
+        </p>
+      )}
     </div>
   );
 }
@@ -103,7 +112,7 @@ export default async function PortfolioPage() {
       .order("sort_order", { ascending: false })
       .limit(3),
     supabase
-    .from("posts")
+      .from("posts")
       .select(
         `id, slug, title, excerpt, content, cover_image_url, published_at, tags,
         post_categories ( categories ( id, name, slug ) )`,
@@ -160,6 +169,7 @@ export default async function PortfolioPage() {
   return (
     <>
       <PixelCharacter />
+
       {/* ───────────────────────────────── HERO — dots */}
       <SectionPattern pattern="dots">
         <section className="py-20 md:py-28">
@@ -167,41 +177,32 @@ export default async function PortfolioPage() {
             <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
               <div className="min-w-0">
                 {availabilityMeta && (
-                  <div className="inline-flex items-center gap-2 text-xs px-2.5 py-1 rounded-full bg-surface border border-border mb-5">
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full ${availabilityMeta.dot}`}
-                    />
-                    <span className="text-text-secondary">
-                      {profile?.availability_note ?? availabilityMeta.label}
-                    </span>
-                  </div>
-                )}
+  <div className="inline-flex items-center gap-2 text-xs px-2.5 py-1 rounded-full bg-surface border border-border mb-5">
+    <span className="relative inline-flex w-2 h-2">
+      {profile?.availability === "available" && (
+        <span
+          className={`absolute inline-flex h-full w-full rounded-full ${availabilityMeta.dot} opacity-60 animate-ping`}
+        />
+      )}
+      <span
+        className={`relative inline-flex w-2 h-2 rounded-full ${availabilityMeta.dot}`}
+      />
+    </span>
+    <span className="text-text-secondary">
+      {profile?.availability_note ?? availabilityMeta.label}
+    </span>
+  </div>
+)}
 
                 <h1 className="text-4xl md:text-6xl font-bold text-text-primary leading-[1.05] tracking-tight mb-4">
                   {profile?.name ?? "Your Name"}
                 </h1>
 
                 {profile?.headline && (
-                  <p className="text-lg md:text-xl text-text-secondary max-w-2xl mb-6">
+                  <p className="text-lg md:text-xl text-text-secondary max-w-2xl mb-8">
                     {profile.headline}
                   </p>
                 )}
-
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-text-secondary mb-8">
-                  {profile?.location && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPinIcon /> {profile.location}
-                    </span>
-                  )}
-                  {profile?.email && (
-                    <a
-                      href={`mailto:${profile.email}`}
-                      className="inline-flex items-center gap-1.5 hover:text-text-primary transition-colors"
-                    >
-                      <MailIcon /> {profile.email}
-                    </a>
-                  )}
-                </div>
 
                 <div className="flex flex-wrap gap-3">
                   <Link
@@ -224,24 +225,46 @@ export default async function PortfolioPage() {
                   )}
                 </div>
 
-                {socials.length > 0 && (
-                  <div className="flex items-center gap-2 mt-8">
-                    {socials.map((s) => {
-                      const Icon = resolveIcon(s.icon_slug);
-                      return (
-                        <a
-                          key={s.id}
-                          href={s.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title={s.label}
-                          data-character-target
-                          className="p-2 rounded-md border border-border bg-surface text-text-secondary hover:text-text-primary hover:border-border-strong transition-colors"
-                        >
-                          <Icon className="w-4 h-4" />
-                        </a>
-                      );
-                    })}
+                {(profile?.location ||
+                  profile?.email ||
+                  socials.length > 0) && (
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-3 mt-8 text-xs text-text-tertiary">
+                    {profile?.location && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPinIcon className="w-3.5 h-3.5" />
+                        {profile.location}
+                      </span>
+                    )}
+                    {profile?.email && (
+                      <a
+                        href={`mailto:${profile.email}`}
+                        className="inline-flex items-center gap-1.5 hover:text-text-primary transition-colors"
+                      >
+                        <MailIcon className="w-3.5 h-3.5" />
+                        {profile.email}
+                      </a>
+                    )}
+
+                    {socials.length > 0 && (
+                      <span className="inline-flex items-center gap-1.5">
+                        {socials.map((s) => {
+                          const Icon = resolveIcon(s.icon_slug);
+                          return (
+                            <a
+                              key={s.id}
+                              href={s.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={s.label}
+                              data-character-target
+                              className="inline-flex p-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors"
+                            >
+                              <Icon className="w-3.5 h-3.5" />
+                            </a>
+                          );
+                        })}
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -279,7 +302,11 @@ export default async function PortfolioPage() {
         <SectionPattern pattern="grid">
           <section className="py-20">
             <div className="max-w-5xl mx-auto px-6">
-              <SectionHeader icon={BriefcaseIcon} title="Experience" />
+              <SectionHeader
+                icon={BriefcaseIcon}
+                title="Experience"
+                description="Where I've worked and what I did there."
+              />
 
               <div className="space-y-10">
                 {experiences.map((exp, i) => (
@@ -596,7 +623,7 @@ export default async function PortfolioPage() {
             <div className="max-w-5xl mx-auto px-6">
               <SectionHeader icon={CodeIcon} title="Skills" />
 
-              <div className="grid gap-8 md:grid-cols-2">
+              <div className="space-y-6">
                 {categories.map((cat) => {
                   const catSkills = skills.filter(
                     (s) => s.category_id === cat.id,
@@ -604,8 +631,11 @@ export default async function PortfolioPage() {
                   if (catSkills.length === 0) return null;
 
                   return (
-                    <div key={cat.id}>
-                      <h3 className="text-sm font-medium text-text-primary mb-3">
+                    <div
+                      key={cat.id}
+                      className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-x-6 gap-y-3 items-start"
+                    >
+                      <h3 className="text-sm font-medium text-text-primary md:pt-1">
                         {cat.name}
                       </h3>
                       <div className="flex flex-wrap gap-1.5">
@@ -643,6 +673,7 @@ export default async function PortfolioPage() {
             <SectionHeader
               icon={CodeIcon}
               title="Featured projects"
+              description="A few things I've built recently."
               action={
                 <Link
                   href="/projects"
@@ -655,7 +686,11 @@ export default async function PortfolioPage() {
 
             <div className="grid gap-6 md:grid-cols-3">
               {featuredProjects.data.map((project) => (
-                <div key={project.id} data-character-target>
+                <div
+                  key={project.id}
+                  data-character-target
+                  className="flex"
+                >
                   <ProjectCard
                     project={{
                       id: project.id,
@@ -683,6 +718,7 @@ export default async function PortfolioPage() {
               <SectionHeader
                 icon={CalendarIcon}
                 title="Recent posts"
+                description="Notes and thoughts from the workbench."
                 action={
                   <Link
                     href="/blog"
@@ -695,7 +731,7 @@ export default async function PortfolioPage() {
 
               <div className="grid gap-6 md:grid-cols-3">
                 {latestPosts.data.map((post) => (
-                  <div key={post.id} data-character-target>
+                  <div key={post.id} data-character-target className="flex">
                     <PostCard
                       post={{
                         id: post.id,

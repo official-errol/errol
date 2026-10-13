@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLogin } from "@/components/auth/login-dialog-provider";
@@ -31,12 +31,31 @@ export function PublicNav({ user, profile }: Props) {
   const { openLogin } = useLogin();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
 
   useEffect(() => {
     setMobileOpen(false);
     setMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [menuOpen]);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -87,11 +106,14 @@ export function PublicNav({ user, profile }: Props) {
 
           <ThemeToggle />
 
-          <div className="hidden md:flex items-center relative">
+          <div className="hidden md:flex items-center relative" ref={menuRef}>
             {user && profile ? (
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  aria-label="Open user menu"
                   className="flex items-center gap-2 p-1 rounded-md hover:bg-surface-subtle transition-colors focus:outline-none"
                 >
                   {profile.avatar_url ? (
@@ -106,7 +128,10 @@ export function PublicNav({ user, profile }: Props) {
                 </button>
 
                 {menuOpen && (
-                  <div className="absolute right-0 top-12 w-56 bg-surface border border-border rounded-md shadow-lg overflow-hidden z-50">
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-12 w-56 bg-surface border border-border rounded-md shadow-lg overflow-hidden z-50"
+                  >
                     <div className="px-4 py-3 border-b border-border">
                       <p className="text-sm font-medium text-text-primary truncate">
                         {profile.full_name ?? "Signed in"}
@@ -120,6 +145,7 @@ export function PublicNav({ user, profile }: Props) {
                       <Link
                         href="/admin"
                         onClick={() => setMenuOpen(false)}
+                        role="menuitem"
                         className="block px-4 py-2 text-sm text-text-primary hover:bg-surface-subtle"
                       >
                         Dashboard
@@ -128,6 +154,7 @@ export function PublicNav({ user, profile }: Props) {
 
                     <button
                       onClick={handleSignOut}
+                      role="menuitem"
                       className="w-full text-left px-4 py-2 text-sm text-error hover:bg-surface-subtle"
                     >
                       Sign out
@@ -147,8 +174,9 @@ export function PublicNav({ user, profile }: Props) {
 
           <button
             onClick={() => setMobileOpen((v) => !v)}
-            className="md:hidden p-2 rounded-md text-text-primary hover:bg-surface-subtle transition-colors"
+            aria-expanded={mobileOpen}
             aria-label="Toggle menu"
+            className="md:hidden p-2 rounded-md text-text-primary hover:bg-surface-subtle transition-colors"
           >
             {mobileOpen ? (
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
