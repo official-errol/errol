@@ -25,9 +25,11 @@ export async function generateMetadata({
 
   if (!cat) return { title: "Category not found" };
 
+  const label = cat.name || cat.slug;
+
   return {
-    title: `Posts in ${cat.slug}`,
-    description: cat.description ?? `Posts filed under ${cat.slug}.`,
+    title: `Posts in ${label}`,
+    description: cat.description ?? `Posts filed under ${label}.`,
     alternates: { canonical: `${BASE_URL}/blog/category/${cat.slug}` },
   };
 }
@@ -48,6 +50,8 @@ export default async function CategoryPage({
 
   if (!cat) notFound();
 
+  const label = cat.name || cat.slug;
+
   const { data: links } = await supabase
     .from("post_categories")
     .select("post_id")
@@ -59,7 +63,7 @@ export default async function CategoryPage({
     ? await supabase
         .from("posts")
         .select(
-          `id, slug, title, excerpt, content, cover_image_url, published_at, tags,
+          `id, slug, title, excerpt, content, cover_image_url, published_at,
            post_categories ( categories ( id, name, slug ) )`,
         )
         .eq("published", true)
@@ -100,10 +104,10 @@ export default async function CategoryPage({
         breadcrumbs={[
           { label: "Portfolio", href: "/" },
           { label: "Blog", href: "/blog" },
-          { label: cat.slug },
+          { label },
         ]}
-        title={cat.slug}
-        description={cat.description ?? `Posts filed under ${cat.slug}.`}
+        title={label}
+        description={cat.description ?? `Posts filed under ${label}.`}
         action={
           <Link
             href="/blog"
@@ -116,33 +120,28 @@ export default async function CategoryPage({
 
       {list.length === 0 ? (
         <EmptyState
-          title={`No posts in ${cat.slug} yet`}
+          title={`No posts in ${label} yet`}
           description="Check back soon."
         />
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
-          {list.map((post) => {
-            const categories = flattenCategories(post.post_categories)
-
-            return (
-              <PostCard
-                key={post.id}
-                post={{
-                  id: post.id,
-                  slug: post.slug,
-                  title: post.title,
-                  excerpt: post.excerpt,
-                  cover_image_url: post.cover_image_url,
-                  published_at: post.published_at,
-                  reading_minutes: getReadingTime(post.content),
-                  comment_count: commentCounts[post.id] ?? 0,
-                  reactions: reactionCounts[post.id],
-                  tags: post.tags ?? [],
-                  categories,
-                }}
-              />
-            );
-          })}
+          {list.map((post) => (
+            <PostCard
+              key={post.id}
+              post={{
+                id: post.id,
+                slug: post.slug,
+                title: post.title,
+                excerpt: post.excerpt,
+                cover_image_url: post.cover_image_url,
+                published_at: post.published_at,
+                reading_minutes: getReadingTime(post.content),
+                comment_count: commentCounts[post.id] ?? 0,
+                reactions: reactionCounts[post.id],
+                categories: flattenCategories(post.post_categories),
+              }}
+            />
+          ))}
         </div>
       )}
     </div>
