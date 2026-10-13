@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { CalendarIcon, MessageIcon } from "@/components/ui/icons";
-import { TagChips } from "./tag-chips";
 import { CategoryChips } from "./category-chip";
 
 type ReactionCounts = {
@@ -21,7 +20,6 @@ type Post = {
   reading_minutes?: number;
   comment_count?: number;
   reactions?: ReactionCounts;
-  tags?: string[];
   categories?: CategoryRef[];
 };
 
@@ -55,12 +53,6 @@ export function PostCard({ post }: { post: Post }) {
       </Link>
 
       <div className="p-6 flex-1 flex flex-col">
-        {post.categories && post.categories.length > 0 && (
-          <div className="mb-2">
-            <CategoryChips categories={post.categories} />
-          </div>
-        )}
-
         <Link href={`/blog/${post.slug}`} className="block">
           <h3 className="font-semibold text-text-primary group-hover:text-accent transition-colors mb-2">
             {post.title}
@@ -73,52 +65,54 @@ export function PostCard({ post }: { post: Post }) {
           </p>
         )}
 
-        {post.tags && post.tags.length > 0 && (
-          <div className="mb-4">
-            <TagChips tags={post.tags.slice(0, 3)} />
-          </div>
-        )}
-
-        <div className="flex items-center justify-between gap-3 mt-auto pt-2">
-          {post.published_at && (
-            <div className="flex items-center gap-1.5 text-xs text-text-tertiary">
-              <CalendarIcon className="w-3.5 h-3.5" />
-              {new Date(post.published_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </div>
+        <div className="mt-auto pt-4 space-y-2">
+          {post.categories && post.categories.length > 0 && (
+            <CategoryChips categories={post.categories} />
           )}
 
-          <div className="flex items-center gap-2.5 text-xs text-text-tertiary">
-            {post.reading_minutes && <span>{post.reading_minutes} min</span>}
-
-            {post.comment_count !== undefined && (
-              <span className="inline-flex items-center gap-1">
-                <MessageIcon className="w-3.5 h-3.5" />
-                {post.comment_count}
-              </span>
-            )}
-
-            {post.reactions && totalReactions > 0 && (
-              <span className="inline-flex items-center gap-2">
-                {(["like", "heart", "fire"] as const).map((kind) => {
-                  const count = post.reactions![kind];
-                  if (count === 0) return null;
-                  return (
-                    <span
-                      key={kind}
-                      className="inline-flex items-center gap-0.5"
-                      title={kind}
-                    >
-                      {REACTION_EMOJI[kind]}
-                      {count}
-                    </span>
-                  );
+          <div className="flex items-center justify-between gap-3 text-xs text-text-tertiary">
+            {post.published_at ? (
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarIcon className="w-3.5 h-3.5 shrink-0" />
+                {new Date(post.published_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
                 })}
               </span>
+            ) : (
+              <span />
             )}
+
+            <div className="flex items-center gap-2.5 shrink-0">
+              {post.reading_minutes && <span>{post.reading_minutes} min</span>}
+
+              {post.comment_count !== undefined && (
+                <span className="inline-flex items-center gap-1">
+                  <MessageIcon className="w-3.5 h-3.5" />
+                  {post.comment_count}
+                </span>
+              )}
+
+              {post.reactions && totalReactions > 0 && (
+                <span className="inline-flex items-center gap-2">
+                  {(["like", "heart", "fire"] as const).map((kind) => {
+                    const count = post.reactions![kind];
+                    if (count === 0) return null;
+                    return (
+                      <span
+                        key={kind}
+                        className="inline-flex items-center gap-0.5"
+                        title={kind}
+                      >
+                        {REACTION_EMOJI[kind]}
+                        {count}
+                      </span>
+                    );
+                  })}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

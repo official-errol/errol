@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { categoryDisplayName } from "@/lib/categories";
 
 type Props = {
   categories: { id: string; name: string; slug: string }[];
@@ -16,10 +17,14 @@ export function CategoryChips({
   const sizeClass =
     size === "md" ? "text-xs px-2.5 py-1" : "text-xs px-2 py-0.5";
 
+  const variantClass =
+    "bg-surface border border-border text-text-secondary font-medium hover:border-border-strong hover:text-text-primary transition-colors";
+
   return (
     <div className="flex flex-wrap gap-1.5">
       {categories.map((cat) => {
-        const classes = `inline-flex items-center ${sizeClass} bg-accent-subtle text-accent rounded-sm font-mono transition-colors hover:bg-accent hover:text-text-inverse`;
+        const classes = `inline-flex items-center ${sizeClass} rounded-sm ${variantClass}`;
+        const label = cat.name || categoryDisplayName(cat.slug);
 
         if (clickable) {
           return (
@@ -28,14 +33,14 @@ export function CategoryChips({
               href={`/blog/category/${cat.slug}`}
               className={classes}
             >
-              {cat.slug}
+              {label}
             </Link>
           );
         }
 
         return (
           <span key={cat.id} className={classes}>
-            {cat.slug}
+            {label}
           </span>
         );
       })}

@@ -4,32 +4,29 @@ import { useEffect, useState, type KeyboardEvent } from "react"
 import { XIcon } from "@/components/ui/icons"
 import {
   MAX_CATEGORIES_PER_POST,
-  normalizeCategory,
-  categoryDisplayName,
+  cleanCategoryName,
+  slugifyCategory,
 } from "@/lib/categories"
 
 type Props = {
+  /** Currently selected category names (case-preserved). */
   value: string[]
   onChange: (categories: string[]) => void
-  placeholder?: string
 }
 
-export function CategoryInput({
-  value,
-  onChange,
-  placeholder = "Add a category…",
-}: Props) {
+type Suggestion = { id: string; name: string; slug: string }
+
+export function CategoryInput({ value, onChange }: Props) {
   const [input, setInput] = useState("")
-  const [suggestions, setSuggestions] = useState<string[]>([])
-  const [focused, setFocused] = useState(false)
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
 
   useEffect(() => {
     let cancelled = false
     fetch("/api/categories")
       .then((r) => r.json())
-      .then((data: { categories?: { slug: string }[] }) => {
+      .then((data: { categories?: Suggestion[] }) => {
         if (cancelled) return
-        setSuggestions((data.categories ?? []).map((c) => c.slug))
+        setSuggestions(data.categories ?? [])
       })
       .catch(() => {})
     return () => {
@@ -37,98 +34,112 @@ export function CategoryInput({
     }
   }, [])
 
-  function addCategory(raw: string) {
-    const slug = normalizeCategory(raw)
-    if (!slug) return
-    if (value.includes(slug)) {
+  const valueSlugs = new Set(value.map((v) => slugifyCategory(v)))
+
+  function toggle(suggestion: Suggestion) {
+    const isSelected = valueSlugs.has(suggestion.slug)
+    if (isSelected) {
+      onChange(value.filter((v) => slugifyCategory(v) !== suggestion.slug))
+    } else {
+      if (value.length >= MAX_CATEGORIES_PER_POST) return
+      onChange([...value, suggestion.name])
+    }
+  }
+
+  function remove(index: number) {
+    onChange(value.filter((_, i) => i !== index))
+  }
+
+  function addFromInput() {
+    const name = cleanCategoryName(input)
+    if (!name) return
+    const slug = slugifyCategory(name)
+    if (!slug) {
+      setInput("")
+      return
+    }
+    if (valueSlugs.has(slug)) {
       setInput("")
       return
     }
     if (value.length >= MAX_CATEGORIES_PER_POST) return
-
-    onChange([...value, slug])
+    onChange([...value, name])
     setInput("")
   }
 
-  function removeCategory(slug: string) {
-    onChange(value.filter((c) => c !== slug))
-  }
-
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" || e.key === ",") {
+    if (e.key === "Enter") {
       e.preventDefault()
-      addCategory(input)
-      return
+      addFromInput()
     }
     if (e.key === "Backspace" && input === "" && value.length > 0) {
-      removeCategory(value[value.length - 1])
+      remove(value.length - 1)
     }
   }
 
-  const remaining = suggestions.filter((s) => !value.includes(s))
-  const showSuggestions =
-    focused && remaining.length > 0 && value.length < MAX_CATEGORIES_PER_POST
+  const remainingSuggestions = suggestions.filter(
+    (s) => !valueSlugs.has(s.slug),
+  )
 
   return (
-    <div>
-      <div className="w-full bg-surface border border-border rounded-sm px-3 py-2 focus-within:border-accent focus-within:ring-2 focus-within:ring-accent-subtle transition-colors">
-        <div className="flex flex-wrap gap-1.5 items-center">
-          {value.map((slug) => (
+    <div className="space-y-3">
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {value.map((name, i) => (
             <span
-              key={slug}
-              className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-accent-subtle text-accent rounded-sm font-mono"
+              key={`${name}-${i}`}
+              className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-surface border border-border-strong text-text-primary rounded-sm font-medium"
             >
-              {slug}
+              {name}
               <button
                 type="button"
-                onClick={() => removeCategory(slug)}
-                className="text-accent/70 hover:text-error transition-colors"
-                aria-label={`Remove ${slug}`}
+                onClick={() => remove(i)}
+                className="text-text-tertiary hover:text-error transition-colors"
+                aria-label={`Remove ${name}`}
               >
                 <XIcon className="w-3 h-3" />
               </button>
             </span>
           ))}
-
-          {value.length < MAX_CATEGORIES_PER_POST && (
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={() => setFocused(true)}
-              onBlur={() => {
-                setFocused(false)
-                if (input.trim()) addCategory(input)
-              }}
-              placeholder={value.length === 0 ? placeholder : ""}
-              maxLength={40}
-              className="flex-1 min-w-[120px] bg-transparent border-0 outline-none text-sm text-text-primary placeholder:text-text-tertiary py-0.5"
-            />
-          )}
         </div>
+      )}
 
-        <p className="text-xs text-text-tertiary mt-1.5">
-          Press <kbd className="font-mono">Enter</kbd> to add ·{" "}
-          {value.length}/{MAX_CATEGORIES_PER_POST}
-        </p>
-      </div>
+      {remainingSuggestions.length > 0 &&
+        value.length < MAX_CATEGORIES_PER_POST && (
+          <div>
+            <p className="text-xs text-text-tertiary mb-1.5">Existing</p>
+            <div className="flex flex-wrap gap-1.5">
+              {remainingSuggestions.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => toggle(s)}
+                  className="text-xs px-2 py-1 bg-surface-subtle text-text-secondary rounded-sm hover:bg-surface hover:border hover:border-border-strong hover:text-text-primary transition-colors"
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
-      {showSuggestions && (
-        <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {remaining.slice(0, 8).map((slug) => (
-            <button
-              key={slug}
-              type="button"
-              onMouseDown={(e) => {
-                e.preventDefault()
-                addCategory(slug)
-              }}
-              className="text-xs px-2 py-0.5 bg-surface-subtle text-text-secondary rounded-sm font-mono hover:bg-accent-subtle hover:text-accent transition-colors"
-            >
-              {categoryDisplayName(slug)}
-            </button>
-          ))}
+      {value.length < MAX_CATEGORIES_PER_POST && (
+        <div className="w-full bg-surface border border-border rounded-sm px-3 py-2 focus-within:border-accent focus-within:ring-2 focus-within:ring-accent-subtle transition-colors">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={() => {
+              if (input.trim()) addFromInput()
+            }}
+            placeholder="Type a new category and press Enter…"
+            maxLength={40}
+            className="w-full bg-transparent border-0 outline-none text-sm text-text-primary placeholder:text-text-tertiary"
+          />
+          <p className="text-xs text-text-tertiary mt-1.5">
+            {value.length}/{MAX_CATEGORIES_PER_POST}
+          </p>
         </div>
       )}
     </div>

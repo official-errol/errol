@@ -29,6 +29,7 @@ import { SectionPattern } from "@/components/ui/section-pattern";
 import { Metadata } from "next";
 import { getReadingTime } from "@/lib/reading-time";
 import { PixelCharacter } from "@/components/character/pixel-character";
+import { flattenCategories } from "@/lib/categories";
 
 function formatRange(
   start: string | null,
@@ -102,9 +103,10 @@ export default async function PortfolioPage() {
       .order("sort_order", { ascending: false })
       .limit(3),
     supabase
-      .from("posts")
+    .from("posts")
       .select(
-        "id, slug, title, excerpt, content, cover_image_url, published_at, tags",
+        `id, slug, title, excerpt, content, cover_image_url, published_at, tags,
+        post_categories ( categories ( id, name, slug ) )`,
       )
       .eq("published", true)
       .order("published_at", { ascending: false })
@@ -705,7 +707,7 @@ export default async function PortfolioPage() {
                         reading_minutes: getReadingTime(post.content),
                         comment_count: latestCommentCounts[post.id] ?? 0,
                         reactions: latestReactionCounts[post.id],
-                        tags: post.tags ?? [],
+                        categories: flattenCategories(post.post_categories),
                       }}
                     />
                   </div>

@@ -3,7 +3,6 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ButtonLink } from "@/components/ui/button";
 import { PostList } from "@/components/admin/post-list";
 import { PlusIcon } from "@/components/ui/icons";
-import { flattenCategories } from "@/lib/categories";
 
 export default async function AdminPostsPage() {
   const supabase = await createClient();
@@ -11,16 +10,9 @@ export default async function AdminPostsPage() {
   const { data: posts } = await supabase
     .from("posts")
     .select(
-      `id, slug, title, cover_image_url, published, published_at, created_at, updated_at, tags,
-       post_categories ( categories ( id, name, slug ) )`,
+      "id, slug, title, cover_image_url, published, published_at, created_at, updated_at, tags",
     )
     .order("created_at", { ascending: false });
-
-  const normalized = (posts ?? []).map((p) => ({
-  ...p,
-  categories: flattenCategories(p.post_categories),
-  post_categories: undefined,
-}));
 
   return (
     <div className="space-y-8">
@@ -36,7 +28,7 @@ export default async function AdminPostsPage() {
         }
       />
 
-      <PostList posts={normalized} />
+      <PostList posts={posts ?? []} />
     </div>
   );
 }

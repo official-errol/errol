@@ -1,6 +1,12 @@
 export const MAX_CATEGORIES_PER_POST = 3
 
-export function normalizeCategory(raw: string): string {
+/** Human-facing: trims, collapses spaces, keeps case and dots. */
+export function cleanCategoryName(raw: string): string {
+  return raw.trim().replace(/\s+/g, " ").slice(0, 40)
+}
+
+/** For lookup/dedup/URLs: lowercase, kebab, strip punctuation. */
+export function slugifyCategory(raw: string): string {
   return raw
     .trim()
     .toLowerCase()
@@ -11,6 +17,7 @@ export function normalizeCategory(raw: string): string {
     .slice(0, 40)
 }
 
+/** Fallback display if a category row is missing its name. */
 export function categoryDisplayName(slug: string): string {
   return slug
     .split("-")
@@ -27,8 +34,8 @@ export type CategoryRef = { id: string; name: string; slug: string }
  */
 export function flattenCategories(
   input:
-    | { categories: CategoryRef | CategoryRef[] | null }
-    | { categories: CategoryRef | CategoryRef[] | null }[]
+    | { categories: Partial<CategoryRef> | Partial<CategoryRef>[] | null }
+    | { categories: Partial<CategoryRef> | Partial<CategoryRef>[] | null }[]
     | null
     | undefined,
 ): CategoryRef[] {
@@ -38,10 +45,15 @@ export function flattenCategories(
   for (const row of rows) {
     const cat = row?.categories
     if (!cat) continue
-    if (Array.isArray(cat)) {
-      for (const c of cat) if (c && c.id) out.push(c)
-    } else if (cat.id) {
-      out.push(cat)
+    const list = Array.isArray(cat) ? cat : [cat]
+    for (const c of list) {
+      if (c?.slug) {
+        out.push({
+          id: c.id ?? c.slug,
+          name: c.name ?? categoryDisplayName(c.slug),
+          slug: c.slug,
+        })
+      }
     }
   }
   return out

@@ -23,7 +23,7 @@ export default async function EditPostPage({
 
   if (!post) notFound();
 
-  const categories = flattenCategories(post.post_categories).map((c) => c.slug);
+  const categories = flattenCategories(post.post_categories).map((c) => c.name);
 
   return (
     <div className="space-y-8">

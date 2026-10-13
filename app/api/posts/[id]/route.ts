@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { MAX_CATEGORIES_PER_POST, normalizeCategory } from "@/lib/categories";
+import {
+  MAX_CATEGORIES_PER_POST,
+  cleanCategoryName,
+  slugifyCategory,
+} from "@/lib/categories";
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -33,36 +37,47 @@ async function syncCategories(
   postId: string,
   rawCategories: string[],
 ) {
-  const slugs = Array.from(
-    new Set(
-      rawCategories
-        .map((c) => normalizeCategory(c))
-        .filter(Boolean)
-        .slice(0, MAX_CATEGORIES_PER_POST),
-    ),
-  );
+  const seen = new Set<string>();
+  const pairs: { name: string; slug: string }[] = [];
+
+  for (const raw of rawCategories) {
+    const name = cleanCategoryName(raw);
+    const slug = slugifyCategory(name);
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    pairs.push({ name, slug });
+    if (pairs.length >= MAX_CATEGORIES_PER_POST) break;
+  }
 
   await supabase.from("post_categories").delete().eq("post_id", postId);
-  if (slugs.length === 0) return;
+  if (pairs.length === 0) return;
 
   const { data: existing } = await supabase
     .from("categories")
-    .select("id, slug")
-    .in("slug", slugs);
+    .select("id, slug, name")
+    .in(
+      "slug",
+      pairs.map((p) => p.slug),
+    );
 
-  const existingMap = new Map((existing ?? []).map((c) => [c.slug, c.id]));
-  const missing = slugs.filter((s) => !existingMap.has(s));
+  const bySlug = new Map(
+    (existing ?? []).map((c) => [c.slug, { id: c.id, name: c.name }]),
+  );
 
+  const missing = pairs.filter((p) => !bySlug.has(p.slug));
   if (missing.length > 0) {
     const { data: created } = await supabase
       .from("categories")
-      .insert(missing.map((slug) => ({ name: slug, slug })))
-      .select("id, slug");
-    for (const c of created ?? []) existingMap.set(c.slug, c.id);
+      .insert(missing.map((p) => ({ name: p.name, slug: p.slug })))
+      .select("id, slug, name");
+
+    for (const c of created ?? []) {
+      bySlug.set(c.slug, { id: c.id, name: c.name });
+    }
   }
 
-  const links = slugs
-    .map((slug) => existingMap.get(slug))
+  const links = pairs
+    .map((p) => bySlug.get(p.slug)?.id)
     .filter((id): id is string => Boolean(id))
     .map((category_id) => ({ post_id: postId, category_id }));
 

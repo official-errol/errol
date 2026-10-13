@@ -5,8 +5,8 @@ import { PublicPageHeader } from "@/components/ui/public-page-header";
 import { PostCard } from "@/components/blog/post-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getReadingTime } from "@/lib/reading-time";
-import { RssIcon, XIcon } from "@/components/ui/icons";
 import { flattenCategories } from "@/lib/categories";
+import { RssIcon, XIcon } from "@/components/ui/icons";
 
 export async function generateMetadata({
   searchParams,
@@ -17,16 +17,27 @@ export async function generateMetadata({
   const cleanTag = tag?.trim().toLowerCase();
   const cleanCategory = category?.trim().toLowerCase();
 
+  let categoryName: string | null = null;
+  if (cleanCategory) {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("categories")
+      .select("name")
+      .eq("slug", cleanCategory)
+      .maybeSingle();
+    categoryName = data?.name ?? cleanCategory;
+  }
+
   const title = cleanTag
     ? `Posts tagged #${cleanTag}`
-    : cleanCategory
-      ? `Posts in ${cleanCategory}`
+    : categoryName
+      ? `Posts in ${categoryName}`
       : "Blog";
 
   const description = cleanTag
     ? `Posts tagged with #${cleanTag} by Errol.`
-    : cleanCategory
-      ? `Posts in the ${cleanCategory} category by Errol.`
+    : categoryName
+      ? `Posts in the ${categoryName} category by Errol.`
       : "Notes, thoughts, and things I have learned while building software and side projects.";
 
   const canonical = cleanTag
@@ -51,7 +62,7 @@ export default async function BlogPage({
 
   const supabase = await createClient();
 
-  // Resolve category slug → id if a category filter is active
+  // Resolve category slug → list of post IDs
   let categoryPostIds: string[] | null = null;
   if (activeCategory) {
     const { data: cat } = await supabase
@@ -86,7 +97,6 @@ export default async function BlogPage({
 
   if (categoryPostIds) {
     if (categoryPostIds.length === 0) {
-      // No posts in this category — force empty result
       query = query.in("id", ["00000000-0000-0000-0000-000000000000"]);
     } else {
       query = query.in("id", categoryPostIds);
@@ -124,12 +134,19 @@ export default async function BlogPage({
     }
   }
 
-  // Fetch category list for the filter row
+  // All categories for the filter row
   const { data: allCategories } = await supabase
     .from("categories")
     .select("id, name, slug")
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
+
+  // Resolve the active category's display name
+  const activeCategoryLabel =
+    (activeCategory &&
+      allCategories?.find((c) => c.slug === activeCategory)?.name) ||
+    activeCategory ||
+    null;
 
   const hasFilter = Boolean(activeTag || activeCategory);
 
@@ -138,17 +155,13 @@ export default async function BlogPage({
       <PublicPageHeader
         breadcrumbs={[{ label: "Portfolio", href: "/" }, { label: "Blog" }]}
         title={
-          activeTag
-            ? `#${activeTag}`
-            : activeCategory
-              ? activeCategory
-              : "Blog"
+          activeTag ? `#${activeTag}` : activeCategoryLabel ?? "Blog"
         }
         description={
           activeTag
             ? `Posts tagged #${activeTag}.`
-            : activeCategory
-              ? `Posts in the ${activeCategory} category.`
+            : activeCategoryLabel
+              ? `Posts in the ${activeCategoryLabel} category.`
               : "Notes, thoughts, and things I've learned."
         }
         action={
@@ -175,15 +188,17 @@ export default async function BlogPage({
         }
       />
 
-      {/* Category filter row */}
+      {/* Category filter row — neutral styling, no accent */}
       {allCategories && allCategories.length > 0 && (
         <div className="mb-8 flex flex-wrap gap-2">
           <Link
-            href={activeTag ? `/blog?tag=${encodeURIComponent(activeTag)}` : "/blog"}
-            className={`text-xs px-2.5 py-1 rounded-sm font-mono transition-colors ${
+            href={
+              activeTag ? `/blog?tag=${encodeURIComponent(activeTag)}` : "/blog"
+            }
+            className={`text-xs px-2.5 py-1 rounded-sm transition-colors ${
               !activeCategory
-                ? "bg-accent text-text-inverse"
-                : "bg-surface-subtle text-text-secondary hover:bg-accent-subtle hover:text-accent"
+                ? "bg-primary text-text-inverse font-medium"
+                : "bg-surface border border-border text-text-secondary hover:border-border-strong hover:text-text-primary"
             }`}
           >
             All
@@ -197,13 +212,13 @@ export default async function BlogPage({
               <Link
                 key={cat.id}
                 href={href}
-                className={`text-xs px-2.5 py-1 rounded-sm font-mono transition-colors ${
+                className={`text-xs px-2.5 py-1 rounded-sm transition-colors ${
                   isActive
-                    ? "bg-accent text-text-inverse"
-                    : "bg-surface-subtle text-text-secondary hover:bg-accent-subtle hover:text-accent"
+                    ? "bg-primary text-text-inverse font-medium"
+                    : "bg-surface border border-border text-text-secondary hover:border-border-strong hover:text-text-primary"
                 }`}
               >
-                {cat.slug}
+                {cat.name || cat.slug}
               </Link>
             );
           })}
@@ -215,11 +230,13 @@ export default async function BlogPage({
           title={
             activeTag
               ? `No posts tagged #${activeTag}`
-              : activeCategory
-                ? `No posts in ${activeCategory}`
+              : activeCategoryLabel
+                ? `No posts in ${activeCategoryLabel}`
                 : "No posts yet"
           }
-          description={hasFilter ? "Try a different filter." : "Check back soon."}
+          description={
+            hasFilter ? "Try a different filter." : "Check back soon."
+          }
           action={
             hasFilter ? (
               <Link
@@ -233,28 +250,23 @@ export default async function BlogPage({
         />
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
-          {posts.map((post) => {
-            const categories = flattenCategories(post.post_categories)
-
-            return (
-              <PostCard
-                key={post.id}
-                post={{
-                  id: post.id,
-                  slug: post.slug,
-                  title: post.title,
-                  excerpt: post.excerpt,
-                  cover_image_url: post.cover_image_url,
-                  published_at: post.published_at,
-                  reading_minutes: getReadingTime(post.content),
-                  comment_count: commentCounts[post.id] ?? 0,
-                  reactions: reactionCounts[post.id],
-                  tags: post.tags ?? [],
-                  categories,
-                }}
-              />
-            );
-          })}
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={{
+                id: post.id,
+                slug: post.slug,
+                title: post.title,
+                excerpt: post.excerpt,
+                cover_image_url: post.cover_image_url,
+                published_at: post.published_at,
+                reading_minutes: getReadingTime(post.content),
+                comment_count: commentCounts[post.id] ?? 0,
+                reactions: reactionCounts[post.id],
+                categories: flattenCategories(post.post_categories),
+              }}
+            />
+          ))}
         </div>
       )}
     </div>
