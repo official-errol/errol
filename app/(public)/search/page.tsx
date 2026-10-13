@@ -6,7 +6,9 @@ import { PublicPageHeader } from "@/components/ui/public-page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchInput } from "@/components/search/search-input";
 import { TagChips } from "@/components/blog/tag-chips";
+import { CategoryChips } from "@/components/blog/category-chip";
 import { getPreviewUrl } from "@/lib/storage";
+import { flattenCategories, slugifyCategory } from "@/lib/categories";
 import {
   FileTextIcon,
   FolderIcon,
@@ -22,6 +24,8 @@ export const metadata: Metadata = {
 
 type SearchParams = Promise<{ q?: string }>;
 
+type CategoryRef = { id: string; name: string; slug: string };
+
 type PostResult = {
   id: string;
   slug: string;
@@ -30,6 +34,7 @@ type PostResult = {
   cover_image_url: string | null;
   published_at: string | null;
   tags: string[];
+  categories: CategoryRef[];
 };
 
 type ProjectResult = {
@@ -80,11 +85,41 @@ async function SearchResults({ query }: { query: string }) {
   if (query.length >= 2) {
     const pattern = `%${escapeForIlike(query)}%`;
     const tagQuery = query.toLowerCase().trim();
+    const categorySlug = slugifyCategory(query);
 
-    const [postsRes, postsTagRes, projectsRes, filesRes] = await Promise.all([
+    // Resolve the query as a possible category slug
+    const { data: cat } = categorySlug
+      ? await supabase
+          .from("categories")
+          .select("id")
+          .eq("slug", categorySlug)
+          .maybeSingle()
+      : { data: null };
+
+    let categoryPostIds: string[] = [];
+    if (cat) {
+      const { data: catLinks } = await supabase
+        .from("post_categories")
+        .select("post_id")
+        .eq("category_id", cat.id);
+      categoryPostIds = (catLinks ?? []).map((l) => l.post_id);
+    }
+
+    const postsSelect = `
+      id, slug, title, excerpt, cover_image_url, published_at, tags,
+      post_categories ( categories ( id, name, slug ) )
+    `;
+
+    const [
+      postsRes,
+      postsTagRes,
+      postsCategoryRes,
+      projectsRes,
+      filesRes,
+    ] = await Promise.all([
       supabase
         .from("posts")
-        .select("id, slug, title, excerpt, cover_image_url, published_at, tags")
+        .select(postsSelect)
         .eq("published", true)
         .or(
           `title.ilike.${pattern},excerpt.ilike.${pattern},content.ilike.${pattern}`,
@@ -94,11 +129,21 @@ async function SearchResults({ query }: { query: string }) {
 
       supabase
         .from("posts")
-        .select("id, slug, title, excerpt, cover_image_url, published_at, tags")
+        .select(postsSelect)
         .eq("published", true)
         .contains("tags", [tagQuery])
         .order("published_at", { ascending: false })
         .limit(PER_GROUP),
+
+      categoryPostIds.length > 0
+        ? supabase
+            .from("posts")
+            .select(postsSelect)
+            .eq("published", true)
+            .in("id", categoryPostIds)
+            .order("published_at", { ascending: false })
+            .limit(PER_GROUP)
+        : Promise.resolve({ data: [] as never[] }),
 
       supabase
         .from("projects")
@@ -120,16 +165,39 @@ async function SearchResults({ query }: { query: string }) {
         .limit(PER_GROUP),
     ]);
 
-    // Merge posts from content match + tag match, deduped by id
+    // Merge all three posts sources, deduped by id
     const postsById = new Map<string, PostResult>();
-    for (const post of postsRes.data ?? []) {
-      postsById.set(post.id, post as PostResult);
-    }
-    for (const post of postsTagRes.data ?? []) {
-      if (!postsById.has(post.id)) {
-        postsById.set(post.id, post as PostResult);
-      }
-    }
+
+    const addPost = (raw: {
+      id: string;
+      slug: string;
+      title: string;
+      excerpt: string | null;
+      cover_image_url: string | null;
+      published_at: string | null;
+      tags: string[] | null;
+      post_categories:
+        | { categories: CategoryRef | CategoryRef[] | null }
+        | { categories: CategoryRef | CategoryRef[] | null }[]
+        | null;
+    }) => {
+      if (postsById.has(raw.id)) return;
+      postsById.set(raw.id, {
+        id: raw.id,
+        slug: raw.slug,
+        title: raw.title,
+        excerpt: raw.excerpt,
+        cover_image_url: raw.cover_image_url,
+        published_at: raw.published_at,
+        tags: raw.tags ?? [],
+        categories: flattenCategories(raw.post_categories),
+      });
+    };
+
+    for (const p of (postsRes.data ?? []) as never[]) addPost(p);
+    for (const p of (postsTagRes.data ?? []) as never[]) addPost(p);
+    for (const p of (postsCategoryRes.data ?? []) as never[]) addPost(p);
+
     posts = Array.from(postsById.values());
 
     projects = (projectsRes.data ?? []) as ProjectResult[];
@@ -221,11 +289,19 @@ async function SearchResults({ query }: { query: string }) {
                       {post.excerpt}
                     </p>
                   )}
-                  {post.tags && post.tags.length > 0 && (
+
+                  {post.categories.length > 0 && (
+                    <div className="mt-2">
+                      <CategoryChips categories={post.categories.slice(0, 3)} />
+                    </div>
+                  )}
+
+                  {post.tags.length > 0 && (
                     <div className="mt-2">
                       <TagChips tags={post.tags.slice(0, 4)} />
                     </div>
                   )}
+
                   {post.published_at && (
                     <div className="flex items-center gap-1.5 text-xs text-text-tertiary mt-2">
                       <CalendarIcon className="w-3.5 h-3.5" />

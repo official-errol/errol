@@ -22,7 +22,6 @@ type Post = {
   published_at: string | null;
   created_at: string;
   updated_at: string;
-  tags: string[];
 };
 
 function formatDate(d: string) {
@@ -106,23 +105,6 @@ export function PostList({ posts }: { posts: Post[] }) {
                   <div className="text-xs text-text-tertiary font-mono mt-0.5">
                     /{post.slug}
                   </div>
-                  {post.tags && post.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1.5">
-                      {post.tags.slice(0, 4).map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-xs px-1.5 py-0.5 bg-surface-subtle text-text-tertiary rounded-sm font-mono"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                      {post.tags.length > 4 && (
-                        <span className="text-xs text-text-tertiary px-1.5 py-0.5">
-                          +{post.tags.length - 4}
-                        </span>
-                      )}
-                    </div>
-                  )}
                 </td>
                 <td className="px-4 py-3 align-top">
                   {post.published ? (
@@ -214,24 +196,6 @@ export function PostList({ posts }: { posts: Post[] }) {
                   /{post.slug}
                 </p>
               </div>
-
-              {post.tags && post.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {post.tags.slice(0, 4).map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs px-1.5 py-0.5 bg-surface-subtle text-text-tertiary rounded-sm font-mono"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                  {post.tags.length > 4 && (
-                    <span className="text-xs text-text-tertiary px-1.5 py-0.5">
-                      +{post.tags.length - 4}
-                    </span>
-                  )}
-                </div>
-              )}
 
               <div className="flex items-center gap-1.5 text-xs text-text-tertiary">
                 <CalendarIcon className="w-3.5 h-3.5" />
